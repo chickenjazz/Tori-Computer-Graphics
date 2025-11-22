@@ -1,3 +1,6 @@
+# ------------------------------------------------------------
+# 1. STANDARD VISUAL STUDIO IGNORES (The "Trash")
+# ------------------------------------------------------------
 .vs/
 x64/
 Debug/
@@ -6,3 +9,23 @@ Release/
 *.pdb
 *.ipch
 *.aps
+*.iobj
+*.tlog
+
+# ------------------------------------------------------------
+# 2. IGNORE ALL COMPILED BINARIES BY DEFAULT
+# ------------------------------------------------------------
+# This prevents you from accidentally uploading your own
+# project's .exe or .dll output.
+*.exe
+*.dll
+*.lib
+*.a
+
+# 3. EXCEPTIONS (The "Treasure")
+# Allow the lib folder inside your project folder
+!Final-Project/lib/*.dll
+!Final-Project/lib/*.lib
+
+# If you decide to put header files in include, allow those too (optional but good practice)
+!Final-Project/include/*.h
