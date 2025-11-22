@@ -4,26 +4,34 @@
 
 using namespace std;
 
-//PROTOTYPES
+// PROTOTYPES
 void displayToriGate();
-//INITIALIZATIONS
 
-// The display callback function for rendering
+// ----------------------------------------------------------------
+// DISPLAY CALLBACK
+// ----------------------------------------------------------------
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
+
+    // Reset transformations
+    glLoadIdentity();
+
     displayToriGate();
+
     glutSwapBuffers();
 }
 
-// Main function
+// ----------------------------------------------------------------
+// MAIN FUNCTION
+// ----------------------------------------------------------------
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB); 
-    glutInitWindowSize(800, 600);
-    glutInitWindowPosition(100, 100);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutCreateWindow("Manuzon - Sandiego - Computer Graphics");
+    glutFullScreen();
 
-    glClearColor(1, 1, 1, 1);
+    // Set background color to White
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     GLenum err = glewInit();
     if (GLEW_OK != err) {
@@ -37,81 +45,79 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+// ----------------------------------------------------------------
+// DATA SECTION
+// ----------------------------------------------------------------
 GLfloat toriGateVertices[] = {
     // ---------------------------------------------------------
     // 1. TOP BLACK ROOF (Kasagi)
     // ---------------------------------------------------------
-    -0.55f,  0.32f,  0.0f,  // Top-Left
-     0.55f,  0.32f,  0.0f,  // Top-Right
-     0.5f,   0.25f,  0.0f,  // Bottom-Right
-    -0.5f,   0.25f,  0.0f,  // Bottom-Left
+    -0.42f,  0.32f,  0.0f,  // Top-Left
+     0.42f,  0.32f,  0.0f,  // Top-Right
+     0.36f,  0.25f,  0.0f,  // Bottom-Right
+    -0.36f,  0.25f,  0.0f,  // Bottom-Left
 
     // ---------------------------------------------------------
     // 2. UPPER RED BEAM (Shimaki)
     // ---------------------------------------------------------
-    -0.45f,  0.25f,  0.0f,  // Top-Left
-     0.45f,  0.25f,  0.0f,  // Top-Right
-     0.38f,  0.15f,  0.0f,  // Bottom-Right
-    -0.38f,  0.15f,  0.0f,  // Bottom-Left
+    -0.35f,  0.25f,  0.0f,  // Top-Left
+     0.35f,  0.25f,  0.0f,  // Top-Right
+     0.3f,  0.19f,  0.0f,  // Bottom-Right
+    -0.3f,  0.19f,  0.0f,  // Bottom-Left
 
     // ---------------------------------------------------------
     // 3. LEFT PILLAR (Hashira)
     // ---------------------------------------------------------
-    -0.3f,   0.18f,  0.0f,  // Top-Left
-    -0.2f,   0.18f,  0.0f,  // Top-Right
-    -0.2f,  -0.6f,   0.0f,  // Bottom-Right
-    -0.3f,  -0.6f,   0.0f,  // Bottom-Left
+    -0.2f,   0.19f,  0.0f,  // Top-Left
+    -0.13f,  0.19f,  0.0f,  // Top-Right
+    -0.13f, -0.6f,   0.0f,  // Bottom-Right
+    -0.2f,  -0.6f,   0.0f,  // Bottom-Left
 
     // ---------------------------------------------------------
     // 4. RIGHT PILLAR (Hashira)
     // ---------------------------------------------------------
-     0.2f,   0.18f,  0.0f,  // Top-Left
-     0.3f,   0.18f,  0.0f,  // Top-Right
-     0.3f,  -0.6f,   0.0f,  // Bottom-Right
-     0.2f,  -0.6f,   0.0f,  // Bottom-Left
+     0.13f,  0.19f,  0.0f,  // Top-Left
+     0.2f,   0.19f,  0.0f,  // Top-Right
+     0.2f,  -0.6f,   0.0f,  // Bottom-Right
+     0.13f, -0.6f,   0.0f,  // Bottom-Left
 
      // ---------------------------------------------------------
      // 5. LOWER RED BEAM (Nuki)
      // ---------------------------------------------------------
-     -0.38f, 0.04f,  0.0f,  // Top-Left
-      0.38f, 0.04f,  0.0f,  // Top-Right
-      0.38f, -0.05f,  0.0f,  // Bottom-Right
-     -0.38f, -0.05f,  0.0f,  // Bottom-Left
+     -0.28f,  0.08f,  0.0f,  // Top-Left
+      0.28f,  0.08f,  0.0f,  // Top-Right
+      0.28f, 0.0f,  0.0f,  // Bottom-Right
+     -0.28f, 0.0f,  0.0f,  // Bottom-Left
 
      // ---------------------------------------------------------
      // 6. MIDDLE STRUT (Gakuzuka)
      // ---------------------------------------------------------
-     -0.05f,  0.18f,  0.0f,  // Top-Left
-      0.05f,  0.18f,  0.0f,  // Top-Right
-      0.05f, -0.05f,  0.0f,  // Bottom-Right
-     -0.05f, -0.05f,  0.0f   // Bottom-Left
+     -0.05f,  0.19f,  0.0f,  // Top-Left
+      0.05f,  0.19f,  0.0f,  // Top-Right
+      0.05f, 0.0f,  0.0f,  // Bottom-Right
+     -0.05f, 0.0f,  0.0f,  // Bottom-Left
+
 };
 
 GLfloat colors[] = {
-    // 1. ROOF (Black) - 4 vertices
-    0.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 0.0f,
+    // 1. ROOF (Black)
+    0.0f, 0.0f, 0.0f,   0.0f, 0.0f, 0.0f,   0.0f, 0.0f, 0.0f,   0.0f, 0.0f, 0.0f,
 
-    // 2. UPPER BEAM (Red) - 4 vertices
-    0.8f, 0.1f, 0.1f,
-    0.8f, 0.1f, 0.1f,
-    0.8f, 0.1f, 0.1f,
-    0.8f, 0.1f, 0.1f,
-
-    // 3. LEFT PILLAR (Red) - 4 vertices
-    0.8f, 0.1f, 0.1f,
-    0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,
-
-    // 4. RIGHT PILLAR (Red) - 4 vertices
+    // 2. UPPER BEAM (Red)
     0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,
 
-    // 5. LOWER BEAM (Red) - 4 vertices
+    // 3. LEFT PILLAR (Red)
     0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,
 
-    // 6. MIDDLE STRUT (Red) - 4 vertices
-    0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f
+    // 4. RIGHT PILLAR (Red)
+    0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,
+
+    // 5. LOWER BEAM (Red)
+    0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,
+
+    // 6. MIDDLE STRUT (Red)
+    0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,
+
 };
 
 void displayToriGate() {
@@ -121,9 +127,8 @@ void displayToriGate() {
     glVertexPointer(3, GL_FLOAT, 0, toriGateVertices);
     glColorPointer(3, GL_FLOAT, 0, colors);
 
-    // Draw 36 vertices (6 parts * 2 triangles * 3 vertices)
+    // Draw 32 vertices (8 parts * 4 vertices per quad)
     glDrawArrays(GL_QUADS, 0, 24);
-    //COMMENTS
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
