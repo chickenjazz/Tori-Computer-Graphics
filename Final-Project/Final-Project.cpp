@@ -2,67 +2,151 @@
 #include <GL/glut.h>
 #include <iostream>
 
-// Function to initialize OpenGL settings
-void InitializeGL() {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black background
-    // Optionally enable depth testing if you plan to draw 3D objects
-    // glEnable(GL_DEPTH_TEST);
-}
+using namespace std;
+
+//PROTOTYPES
+void displayToriGate();
+//INITIALIZATIONS
 
 // The display callback function for rendering
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth if depth testing is enabled
-
-    // --- Drawing a Red Triangle ---
-    glMatrixMode(GL_PROJECTION); // Set projection matrix mode
-    glLoadIdentity();            // Reset the projection matrix
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0); // Define a 2D orthographic projection (left, right, bottom, top, near, far)
-
-    glMatrixMode(GL_MODELVIEW);  // Set modelview matrix mode
-    glLoadIdentity();            // Reset the modelview matrix
-
-    glColor3f(1.0f, 0.0f, 0.0f); // Set the drawing color to red (RGB)
-
-    glBegin(GL_TRIANGLES);       // Start drawing triangles
-    glVertex2f(0.0f, 0.5f);  // Top vertex
-    glVertex2f(-0.5f, -0.5f); // Bottom-left vertex
-    glVertex2f(0.5f, -0.5f); // Bottom-right vertex
-    glEnd();                     // End drawing triangles
-    // ----------------------------
-
-    glutSwapBuffers(); // Swap the front and back buffers to display the rendered image
-}
-
-// The reshape callback function (called when the window is resized)
-void Reshape(int width, int height) {
-    glViewport(0, 0, width, height); // Set the viewport to cover the new window area
+    displayToriGate();
+    glutSwapBuffers();
 }
 
 // Main function
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB); 
     glutInitWindowSize(800, 600);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("GLUT & GLEW OpenGL Example - Red Triangle");
+    glutCreateWindow("Manuzon - Sandiego - Computer Graphics");
+
+    glClearColor(1, 1, 1, 1);
 
     GLenum err = glewInit();
     if (GLEW_OK != err) {
         std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
         return 1;
     }
-    std::cout << "Status: Using GLEW " << glewGetString(GLEW_VERSION) << std::endl;
-    std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
-    std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 
-    InitializeGL();
     glutDisplayFunc(Display);
-    glutReshapeFunc(Reshape);
-
     glutMainLoop();
 
-
-    //comments2
     return 0;
+}
+
+GLfloat toriGateVertices[] = {
+    // ---------------------------------------------------------
+    // 1. TOP BLACK ROOF (Kasagi) - Wide rectangle at the very top
+    // ---------------------------------------------------------
+    // Triangle 1
+    -0.6f,  0.9f, 0.0f,  // Top-Left
+     0.6f,  0.9f, 0.0f,  // Top-Right
+    -0.6f,  0.8f, 0.0f,  // Bottom-Left
+    // Triangle 2
+     0.6f,  0.9f, 0.0f,  // Top-Right
+     0.6f,  0.8f, 0.0f,  // Bottom-Right
+    -0.6f,  0.8f, 0.0f,  // Bottom-Left
+
+    // ---------------------------------------------------------
+    // 2. UPPER RED BEAM (Shimaki) - Just below the roof
+    // ---------------------------------------------------------
+    // Triangle 1
+    -0.55f, 0.8f, 0.0f,  // Top-Left
+     0.55f, 0.8f, 0.0f,  // Top-Right
+    -0.55f, 0.65f, 0.0f, // Bottom-Left
+    // Triangle 2
+     0.55f, 0.8f, 0.0f,  // Top-Right
+     0.55f, 0.65f, 0.0f, // Bottom-Right
+    -0.55f, 0.65f, 0.0f, // Bottom-Left
+
+    // ---------------------------------------------------------
+    // 3. LEFT PILLAR (Hashira)
+    // ---------------------------------------------------------
+    // Triangle 1
+    -0.4f,  0.65f, 0.0f, // Top-Left
+    -0.3f,  0.65f, 0.0f, // Top-Right
+    -0.4f, -0.8f, 0.0f,  // Bottom-Left
+    // Triangle 2
+    -0.3f,  0.65f, 0.0f, // Top-Right
+    -0.3f, -0.8f, 0.0f,  // Bottom-Right
+    -0.4f, -0.8f, 0.0f,  // Bottom-Left
+
+    // ---------------------------------------------------------
+    // 4. RIGHT PILLAR (Hashira)
+    // ---------------------------------------------------------
+    // Triangle 1
+     0.3f,  0.65f, 0.0f, // Top-Left
+     0.4f,  0.65f, 0.0f, // Top-Right
+     0.3f, -0.8f, 0.0f,  // Bottom-Left
+     // Triangle 2
+      0.4f,  0.65f, 0.0f, // Top-Right
+      0.4f, -0.8f, 0.0f,  // Bottom-Right
+      0.3f, -0.8f, 0.0f,  // Bottom-Left
+
+      // ---------------------------------------------------------
+      // 5. LOWER RED BEAM (Nuki) - Connects the pillars
+      // ---------------------------------------------------------
+      // Triangle 1
+      -0.55f, 0.45f, 0.0f, // Top-Left
+       0.55f, 0.45f, 0.0f, // Top-Right
+      -0.55f, 0.35f, 0.0f, // Bottom-Left
+      // Triangle 2
+       0.55f, 0.45f, 0.0f, // Top-Right
+       0.55f, 0.35f, 0.0f, // Bottom-Right
+      -0.55f, 0.35f, 0.0f, // Bottom-Left
+
+      // ---------------------------------------------------------
+      // 6. MIDDLE STRUT (Gakuzuka) - Small vertical bar in center
+      // ---------------------------------------------------------
+      // Triangle 1
+      -0.05f, 0.65f, 0.0f, // Top-Left
+       0.05f, 0.65f, 0.0f, // Top-Right
+      -0.05f, 0.45f, 0.0f, // Bottom-Left
+      // Triangle 2
+       0.05f, 0.65f, 0.0f, // Top-Right
+       0.05f, 0.45f, 0.0f, // Bottom-Right
+      -0.05f, 0.45f, 0.0f  // Bottom-Left
+};
+
+GLfloat colors[] = {
+    // 1. ROOF (Black) - 6 vertices
+    0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
+
+    // 2. UPPER BEAM (Deep Red) - 6 vertices
+    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+
+    // 3. LEFT PILLAR (Deep Red) - 6 vertices
+    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+
+    // 4. RIGHT PILLAR (Deep Red) - 6 vertices
+    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+
+    // 5. LOWER BEAM (Deep Red) - 6 vertices
+    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+
+    // 6. CENTER STRUT (Deep Red) - 6 vertices
+    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f
+};
+
+void displayToriGate() {
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    glVertexPointer(4, GL_FLOAT, 0, toriGateVertices);
+    glColorPointer(4, GL_FLOAT, 0, colors);
+
+    // Draw 36 vertices (6 parts * 2 triangles * 3 vertices)
+    glDrawArrays(GL_POLYGON, 0, 36);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
 }
