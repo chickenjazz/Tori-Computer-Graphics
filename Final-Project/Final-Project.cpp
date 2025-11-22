@@ -141,11 +141,11 @@ void displayToriGate() {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
-    glVertexPointer(4, GL_FLOAT, 0, toriGateVertices);
-    glColorPointer(4, GL_FLOAT, 0, colors);
+    glVertexPointer(3, GL_FLOAT, 0, toriGateVertices);
+    glColorPointer(3, GL_FLOAT, 0, colors);
 
     // Draw 36 vertices (6 parts * 2 triangles * 3 vertices)
-    glDrawArrays(GL_POLYGON, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
