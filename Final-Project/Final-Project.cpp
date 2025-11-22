@@ -146,6 +146,7 @@ void displayToriGate() {
 
     // Draw 36 vertices (6 parts * 2 triangles * 3 vertices)
     glDrawArrays(GL_TRIANGLES, 0, 36);
+    //COMMENTS
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
