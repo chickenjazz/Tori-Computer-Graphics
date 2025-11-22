@@ -38,103 +38,69 @@ int main(int argc, char** argv) {
 }
 
 GLfloat toriGateVertices[] = {
-    // ---------------------------------------------------------
-    // 1. TOP BLACK ROOF (Kasagi) - Wide rectangle at the very top
-    // ---------------------------------------------------------
-    // Triangle 1
-    -0.6f,  0.9f, 0.0f,  // Top-Left
-     0.6f,  0.9f, 0.0f,  // Top-Right
-    -0.6f,  0.8f, 0.0f,  // Bottom-Left
-    // Triangle 2
-     0.6f,  0.9f, 0.0f,  // Top-Right
-     0.6f,  0.8f, 0.0f,  // Bottom-Right
-    -0.6f,  0.8f, 0.0f,  // Bottom-Left
+    // 1. TOP BLACK ROOF (Kasagi)
+    // Top-Left, Top-Right, Bottom-Right, Bottom-Left
+    -0.5f,  0.3f,  0.0f,
+     0.5f,  0.3f,  0.0f,
+     0.45f,  0.25f, 0.0f,
+    -0.45f,  0.25f, 0.0f,
 
-    // ---------------------------------------------------------
-    // 2. UPPER RED BEAM (Shimaki) - Just below the roof
-    // ---------------------------------------------------------
-    // Triangle 1
-    -0.55f, 0.8f, 0.0f,  // Top-Left
-     0.55f, 0.8f, 0.0f,  // Top-Right
-    -0.55f, 0.65f, 0.0f, // Bottom-Left
-    // Triangle 2
-     0.55f, 0.8f, 0.0f,  // Top-Right
-     0.55f, 0.65f, 0.0f, // Bottom-Right
-    -0.55f, 0.65f, 0.0f, // Bottom-Left
+    // 2. UPPER RED BEAM (Shimaki)
+    -0.45f, 0.25f, 0.0f,
+     0.45f, 0.25f, 0.0f,
+     0.45f, 0.18f, 0.0f,
+    -0.45f, 0.18f, 0.0f,
 
-    // ---------------------------------------------------------
-    // 3. LEFT PILLAR (Hashira)
-    // ---------------------------------------------------------
-    // Triangle 1
-    -0.4f,  0.65f, 0.0f, // Top-Left
-    -0.3f,  0.65f, 0.0f, // Top-Right
-    -0.4f, -0.8f, 0.0f,  // Bottom-Left
-    // Triangle 2
-    -0.3f,  0.65f, 0.0f, // Top-Right
-    -0.3f, -0.8f, 0.0f,  // Bottom-Right
-    -0.4f, -0.8f, 0.0f,  // Bottom-Left
+    // 3. LEFT PILLAR (Hashira) - Extends to -0.6 bottom
+    -0.4f,  0.18f, 0.0f,
+    -0.3f,  0.18f, 0.0f,
+    -0.3f, -0.6f,  0.0f,
+    -0.4f, -0.6f,  0.0f,
 
-    // ---------------------------------------------------------
-    // 4. RIGHT PILLAR (Hashira)
-    // ---------------------------------------------------------
-    // Triangle 1
-     0.3f,  0.65f, 0.0f, // Top-Left
-     0.4f,  0.65f, 0.0f, // Top-Right
-     0.3f, -0.8f, 0.0f,  // Bottom-Left
-     // Triangle 2
-      0.4f,  0.65f, 0.0f, // Top-Right
-      0.4f, -0.8f, 0.0f,  // Bottom-Right
-      0.3f, -0.8f, 0.0f,  // Bottom-Left
+    // 4. RIGHT PILLAR (Hashira) - Extends to -0.6 bottom
+     0.3f,  0.18f, 0.0f,
+     0.4f,  0.18f, 0.0f,
+     0.4f, -0.6f,  0.0f,
+     0.3f, -0.6f,  0.0f,
 
-      // ---------------------------------------------------------
-      // 5. LOWER RED BEAM (Nuki) - Connects the pillars
-      // ---------------------------------------------------------
-      // Triangle 1
-      -0.55f, 0.45f, 0.0f, // Top-Left
-       0.55f, 0.45f, 0.0f, // Top-Right
-      -0.55f, 0.35f, 0.0f, // Bottom-Left
-      // Triangle 2
-       0.55f, 0.45f, 0.0f, // Top-Right
-       0.55f, 0.35f, 0.0f, // Bottom-Right
-      -0.55f, 0.35f, 0.0f, // Bottom-Left
+     // 5. LOWER RED BEAM (Nuki)
+     -0.55f, -0.15f, 0.0f,
+      0.55f, -0.15f, 0.0f,
+      0.55f, -0.22f, 0.0f,
+     -0.55f, -0.22f, 0.0f,
 
-      // ---------------------------------------------------------
-      // 6. MIDDLE STRUT (Gakuzuka) - Small vertical bar in center
-      // ---------------------------------------------------------
-      // Triangle 1
-      -0.05f, 0.65f, 0.0f, // Top-Left
-       0.05f, 0.65f, 0.0f, // Top-Right
-      -0.05f, 0.45f, 0.0f, // Bottom-Left
-      // Triangle 2
-       0.05f, 0.65f, 0.0f, // Top-Right
-       0.05f, 0.45f, 0.0f, // Bottom-Right
-      -0.05f, 0.45f, 0.0f  // Bottom-Left
+     // 6. MIDDLE STRUT (Gakuzuka)
+     -0.05f,  0.18f, 0.0f,
+      0.05f,  0.18f, 0.0f,
+      0.05f, -0.15f, 0.0f,
+     -0.05f, -0.15f, 0.0f
 };
 
 GLfloat colors[] = {
-    // 1. ROOF (Black) - 6 vertices
-    0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
+    // 1. ROOF (Black) - 4 vertices
+    0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f,
 
-    // 2. UPPER BEAM (Deep Red) - 6 vertices
-    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
-    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+    // 2. UPPER BEAM (Red) - 4 vertices
+    0.8f, 0.1f, 0.1f,
+    0.8f, 0.1f, 0.1f,
+    0.8f, 0.1f, 0.1f,
+    0.8f, 0.1f, 0.1f,
 
-    // 3. LEFT PILLAR (Deep Red) - 6 vertices
-    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
-    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+    // 3. LEFT PILLAR (Red) - 4 vertices
+    0.8f, 0.1f, 0.1f,
+    0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,
 
-    // 4. RIGHT PILLAR (Deep Red) - 6 vertices
-    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
-    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+    // 4. RIGHT PILLAR (Red) - 4 vertices
+    0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,
 
-    // 5. LOWER BEAM (Deep Red) - 6 vertices
-    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
-    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
+    // 5. LOWER BEAM (Red) - 4 vertices
+    0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,
 
-    // 6. CENTER STRUT (Deep Red) - 6 vertices
-    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,
-    0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f,  0.8f, 0.1f, 0.1f
+    // 6. MIDDLE STRUT (Red) - 4 vertices
+    0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f,   0.8f, 0.1f, 0.1f
 };
 
 void displayToriGate() {
@@ -145,7 +111,7 @@ void displayToriGate() {
     glColorPointer(3, GL_FLOAT, 0, colors);
 
     // Draw 36 vertices (6 parts * 2 triangles * 3 vertices)
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_QUADS, 0, 24);
     //COMMENTS
 
     glDisableClientState(GL_VERTEX_ARRAY);
