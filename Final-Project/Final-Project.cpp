@@ -150,5 +150,5 @@ void displayToriGate() {
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
 
-    //isa pang try
+    //bat di gumagana
 }
