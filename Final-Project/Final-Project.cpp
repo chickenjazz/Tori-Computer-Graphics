@@ -13,6 +13,7 @@ void displayBoy();
 void initVBOs();
 void displayBirds();
 void mouseCallback(int button, int state, int x, int y);
+void animateGodzilla(int value); 
 
 const int NUM_BIRDS = 15;
 const GLfloat BIRD_COLOR[] = { 0.0f, 0.0f, 0.0f }; // Black Birds
@@ -21,6 +22,36 @@ GLuint boyVBO[2];
 GLfloat birdOffsets[NUM_BIRDS * 2]; // Storage for static X and Y offsets
 
 bool isFiring = false;
+
+// NEW: Animation Variables
+float godzillaX = 1.0f; // Start position (Off-screen left)
+bool animationStarted = false;
+
+// ----------------------------------------------------------------
+// TIMER FUNCTION (ANIMATION)
+// ----------------------------------------------------------------
+void animateGodzilla(int value) {
+    // Value 0: The Initial Delay (Wait 2 seconds before starting)
+    if (value == 0) {
+        animationStarted = true;
+        // Call self again with value 1 to start moving immediately
+        glutTimerFunc(500, animateGodzilla, 1);
+    }
+    // Value 1: The Movement Loop (60 FPS)
+    else if (value == 1) {
+        if (godzillaX > 0.0f) {
+            godzillaX -= 0.01f; // Move left by 0.01 units
+
+            // Cap it at 0.0f so he stops exactly at the original spot
+            if (godzillaX < 0.0f) godzillaX = 0.0f;
+
+            glutPostRedisplay(); // Redraw screen
+
+            // Keep calling this timer until he arrives
+            glutTimerFunc(100, animateGodzilla, 1);
+        }
+    }
+}
 
 // ----------------------------------------------------------------
 // MOUSE CALLBACK
@@ -48,11 +79,21 @@ void Display() {
 
     displayToriGate();
 
+    // --- APPLY GODZILLA MOVEMENT ---
+    glPushMatrix(); // Save current state (Origin)
+
+    // Translate Godzilla based on the timer variable
+    glTranslatef(godzillaX, 0.0f, 0.0f);
+
     displayGodzilla();
 
+    // Fire is inside the Push/Pop so it moves WITH Godzilla's mouth
     if (isFiring) {
         displayFire();
     }
+
+    glPopMatrix(); // Restore state (Origin) so Boy/Gate don't move
+    // -------------------------------
 
     displayBoy();
     
@@ -93,6 +134,8 @@ int main(int argc, char** argv) {
         birdOffsets[i * 2] = xOffset;     // Store X offset
         birdOffsets[i * 2 + 1] = yOffset; // Store Y offset
     }
+
+    glutTimerFunc(1000, animateGodzilla, 0);
 
     glutMouseFunc(mouseCallback);
     glutDisplayFunc(Display);
