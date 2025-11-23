@@ -8,6 +8,7 @@ using namespace std;
 // PROTOTYPES
 void displayBackground();
 void displayToriGate();
+void snowpile();
 void displayGodzilla();
 void displayFire();
 void displayBoy();
@@ -106,7 +107,6 @@ void animateGodzilla(int value) {
         }
 
         // --- 3. ALWAYS LOOP ---
-        // This must be outside the 'if' so clouds keep moving
         glutPostRedisplay();
         glutTimerFunc(16, animateGodzilla, 1);
     }
@@ -307,6 +307,7 @@ void Display() {
 
     // Gate and Boy also shake with the ground
     displayToriGate();
+    snowpile();
     displayBoy();
     glPopMatrix(); // End ground shake
 
@@ -657,6 +658,165 @@ void displayToriGate() {
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
 }
+
+//-----------------------------------------------------------------
+// PILE OF SNOW
+//-----------------------------------------------------------------
+void snowpile() {
+    // Enable Blending for soft edges/transparency
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Enable Point Smoothing to make the GL_POINTS look like round snowballs
+    glEnable(GL_POINT_SMOOTH);
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+
+    // =========================================================
+    // LAYER 3: RANDOM SNOW CHUNKS (GL_POINTS)
+    // =========================================================
+    glPointSize(20.0f); // Big chunky snowballs
+    glBegin(GL_POINTS);
+    glColor4f(0.9f, 0.95f, 1.0f, 0.25f); // Almost pure white
+
+    srand(50);
+
+    for (int i = 0; i < 10000; i++) {
+        // Random X between -1.0 and 1.0
+        float rX = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+
+        // Random Y between -1.0 and -0.6 (Snowfield area)
+        float rY = -1.0f + ((float)rand() / RAND_MAX) * 0.38f;
+
+        glVertex3f(rX, rY, 0.0f);
+    }
+    glEnd();
+
+    glPointSize(18.0f); // Big chunky snowballs
+    glBegin(GL_POINTS);
+    glColor4f(1.0f, 1.0f, 1.0f, 0.15f); // pure white
+
+    // Use a constant seed so they don't jitter every frame
+    srand(50);
+
+    for (int i = 0; i < 5000; i++) {
+        // Random X between -1.0 and 1.0
+        float rX = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+
+        // Random Y between -1.0 and -0.6 (Snowfield area)
+        float rY = -1.0f + ((float)rand() / RAND_MAX) * 0.38f;
+
+        glVertex3f(rX, rY, 0.0f);
+    }
+    glEnd();
+
+    // =========================================================
+    // LAYER 2: ORIGINAL PILES (Foreground)
+    // Updated to use glColor4f for blending
+    // =========================================================
+
+    // PILE 1: FAR LEFT
+    glBegin(GL_POLYGON);
+
+    glColor4f(0.85f, 0.85f, 0.95f, 0.65f); // Base
+    glVertex3f(-0.95f, -0.90f, 0.0f);
+    glVertex3f(-0.85f, -0.92f, 0.0f);
+    glVertex3f(-0.70f, -0.90f, 0.0f);
+
+    glColor4f(1.0f, 1.0f, 1.0f, 0.65f);    // Top
+    glVertex3f(-0.65f, -0.80f, 0.0f);
+    glVertex3f(-0.72f, -0.70f, 0.0f);
+    glVertex3f(-0.80f, -0.75f, 0.0f);
+    glVertex3f(-0.88f, -0.68f, 0.0f);
+
+    glColor4f(0.95f, 0.95f, 1.0f, 0.65f);
+    glVertex3f(-0.98f, -0.80f, 0.0f);
+    glEnd();
+
+    // PILE 2: MID LEFT
+    glBegin(GL_POLYGON);
+
+    glColor4f(0.85f, 0.85f, 0.95f, 0.65f);
+    glVertex3f(-0.60f, -0.85f, 0.0f);
+    glVertex3f(-0.50f, -0.88f, 0.0f);
+    glVertex3f(-0.35f, -0.85f, 0.0f);
+
+    glColor4f(1.0f, 1.0f, 1.0f, 0.85f);
+    glVertex3f(-0.38f, -0.75f, 0.0f);
+    glVertex3f(-0.42f, -0.65f, 0.0f);
+    glVertex3f(-0.48f, -0.70f, 0.0f);
+    glVertex3f(-0.52f, -0.62f, 0.0f);
+    glVertex3f(-0.58f, -0.72f, 0.0f);
+    glEnd();
+
+    // PILE 3: CENTER LEFT
+    glBegin(GL_POLYGON);
+
+    glColor4f(0.85f, 0.85f, 0.95f, 0.65f);
+    glVertex3f(-0.3f, -0.75f, 0.0f);
+    glVertex3f(-0.2f, -0.78f, 0.0f);
+
+    glColor4f(1.0f, 1.0f, 1.0f, 0.85f);
+    glVertex3f(-0.15f, -0.65f, 0.0f);
+    glVertex3f(-0.19f, -0.68f, 0.0f);
+    glVertex3f(-0.23f, -0.62f, 0.0f);
+    glVertex3f(-0.27f, -0.59f, 0.0f);
+    glVertex3f(-0.31f, -0.65f, 0.0f);
+    glVertex3f(-0.33f, -0.70f, 0.0f);
+    glEnd();
+
+    // PILE 4: CENTER RIGHT
+    glBegin(GL_POLYGON);
+
+    glColor4f(0.85f, 0.85f, 0.95f, 0.75f);
+    glVertex3f(0.15f, -0.70f, 0.0f);
+    glVertex3f(0.25f, -0.72f, 0.0f);
+
+    glColor4f(1.0f, 1.0f, 1.0f, 0.55f);
+    glVertex3f(0.35f, -0.70f, 0.0f);
+    glVertex3f(0.45f, -0.65f, 0.0f);
+    glVertex3f(0.38f, -0.57f, 0.0f);
+    glVertex3f(0.30f, -0.63f, 0.0f);
+    glVertex3f(0.22f, -0.6f, 0.0f);
+    glVertex3f(0.15f, -0.65f, 0.0f);
+    glEnd();
+
+    // PILE 5: MID RIGHT
+    glBegin(GL_POLYGON);
+
+    glColor4f(0.85f, 0.85f, 0.95f, 0.65f);
+    glVertex3f(0.50f, -0.85f, 0.0f);
+    glVertex3f(0.65f, -0.85f, 0.0f);
+
+    glColor4f(1.0f, 1.0f, 1.0f, 0.85f);
+    glVertex3f(0.70f, -0.75f, 0.0f);
+    glVertex3f(0.62f, -0.65f, 0.0f);
+    glVertex3f(0.58f, -0.70f, 0.0f);
+    glVertex3f(0.55f, -0.68f, 0.0f);
+    glVertex3f(0.52f, -0.75f, 0.0f);
+    glVertex3f(0.48f, -0.80f, 0.0f);
+    glEnd();
+
+    // PILE 6: FAR RIGHT
+    glBegin(GL_POLYGON);
+    glColor4f(0.85f, 0.85f, 0.95f, 0.85f);
+    glVertex3f(0.75f, -0.90f, 0.0f);
+    glVertex3f(0.95f, -0.90f, 0.0f);
+
+    glColor4f(1.0f, 1.0f, 1.0f, 0.55f);
+    glVertex3f(0.98f, -0.80f, 0.0f);
+    glVertex3f(0.92f, -0.72f, 0.0f);
+    glVertex3f(0.88f, -0.75f, 0.0f);
+    glVertex3f(0.85f, -0.70f, 0.0f);
+    glVertex3f(0.80f, -0.78f, 0.0f);
+    glVertex3f(0.72f, -0.85f, 0.0f);
+    glEnd();
+
+
+    glDisable(GL_POINT_SMOOTH);
+    glDisable(GL_BLEND);
+    glFlush();
+}
+
 
 // ----------------------------------------------------------------
 // GODZILLA (Vertex Arrays + Procedural Spikes)
