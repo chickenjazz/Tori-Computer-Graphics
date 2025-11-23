@@ -7,6 +7,10 @@ using namespace std;
 // PROTOTYPES
 void displayToriGate();
 void displayGodzilla();
+void displayBoy();
+void initVBOs();
+
+GLuint boyVBO[2];
 
 // ----------------------------------------------------------------
 // DISPLAY CALLBACK
@@ -19,7 +23,7 @@ void Display() {
 
     displayToriGate();
     //displayGodzilla();
-
+    displayBoy();
     glutSwapBuffers();
 }
 
@@ -41,6 +45,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    initVBOs();
     glutDisplayFunc(Display);
     glutMainLoop();
 
@@ -269,4 +274,140 @@ void displayGodzilla() {
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
+}
+
+
+
+GLfloat boyVertices[] = {
+    // ---------------------------------------------------------
+    // 1. HEAD (Square)
+    // ---------------------------------------------------------
+    -0.025f,  0.07f, 0.0f,  // Head Top-Left
+     0.025f,  0.07f, 0.0f,  // Head Top-Right
+     0.025f, -0.01f, 0.0f,  // Head Bottom-Right
+    -0.025f, -0.01f, 0.0f,  // Head Bottom-Left
+    // ---------------------------------------------------------
+    // 2. BODY (Rectangle)
+    // ---------------------------------------------------------
+    -0.03f,  0.0f,  0.0f,   // Body Top-Left
+     0.03f,  0.0f,  0.0f,   // Body Top-Right
+     0.03f, -0.12f, 0.0f,   // Body Bottom-Right
+    -0.03f, -0.12f, 0.0f,   // Body Bottom-Left
+    // ---------------------------------------------------------
+    // 3. LEFT ARM
+    // ---------------------------------------------------------
+    -0.065f,  0.0f,  0.0f,  // Left Arm Top-Left
+    -0.03f,   0.0f,  0.0f,  // Left Arm Top-Right
+    -0.03f,  -0.08f, 0.0f,  // Left Arm Bottom-Right
+    -0.065f, -0.08f, 0.0f,  // Left Arm Bottom-Left
+    // ---------------------------------------------------------
+    // 4. RIGHT ARM
+    // ---------------------------------------------------------
+     0.03f,  0.0f,  0.0f,   // Right Arm Top-Left
+     0.065f, 0.0f,  0.0f,   // Right Arm Top-Right
+     0.065f, -0.08f, 0.0f,  // Right Arm Bottom-Right
+     0.03f, -0.08f, 0.0f,   // Right Arm Bottom-Left
+     // ---------------------------------------------------------
+     
+     //5. Left leg
+     -0.03f,  -0.12f, 0.0f,  // Left Leg Top-Left
+     -0.0f,   -0.12f, 0.0f,  // Left Leg Top-Right
+     -0.0f,   -0.25f, 0.0f,  // Left Leg Bottom-Right
+     -0.03f,  -0.25f, 0.0f,  // Left Leg Bottom-Left
+
+     //6. Right leg
+      0.0f,  -0.12f, 0.0f,   // Right Leg Top-Left
+      0.03f, -0.12f, 0.0f,   // Right Leg Top-Right
+      0.03f, -0.25f, 0.0f,   // Right Leg Bottom-Right
+      0.0f,  -0.25f, 0.0f,   // Right Leg Bottom-Left
+};
+
+GLfloat boyColors[] = {
+    // 1. HEAD (Skin) - 4
+    1.0f, 0.8f, 0.6f,
+    1.0f, 0.8f, 0.6f,
+    1.0f, 0.8f, 0.6f,
+    1.0f, 0.8f, 0.6f,
+
+    // 2. BODY (Blue Shirt) - 4
+    0.2f, 0.4f, 0.8f,
+    0.2f, 0.4f, 0.8f,
+    0.2f, 0.4f, 0.8f,
+    0.2f, 0.4f, 0.8f,
+
+    // 3. LEFT ARM (Blue) - 4
+    0.2f, 0.4f, 0.8f,
+    0.2f, 0.4f, 0.8f,
+    0.2f, 0.4f, 0.8f,
+    0.2f, 0.4f, 0.8f,
+
+    // 4. RIGHT ARM (Blue) - 4
+    0.2f, 0.4f, 0.8f,
+    0.2f, 0.4f, 0.8f,
+    0.2f, 0.4f, 0.8f,
+    0.2f, 0.4f, 0.8f,
+
+    // 5. LEFT LEG (Brown Pants) - 4
+    0.4f, 0.25f, 0.1f,
+    0.4f, 0.25f, 0.1f,
+    0.4f, 0.25f, 0.1f,
+    0.4f, 0.25f, 0.1f,
+
+    // 6. RIGHT LEG (Brown Pants) - 4
+    0.4f, 0.25f, 0.1f,
+    0.4f, 0.25f, 0.1f,
+    0.4f, 0.25f, 0.1f,
+    0.4f, 0.25f, 0.1f,
+};
+
+// ----------------------------------------------------------------
+// INITIALIZE VBOs for the Boy Object
+// ----------------------------------------------------------------
+void initVBOs() {
+    // Generate two buffer IDs (one for vertices, one for colors)
+    glGenBuffers(2, boyVBO);
+
+    // 1. Bind and buffer data for vertices
+    glBindBuffer(GL_ARRAY_BUFFER, boyVBO[0]);
+    // Load the boyVertices array data into the buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(boyVertices), boyVertices, GL_STATIC_DRAW);
+
+    // 2. Bind and buffer data for colors
+    glBindBuffer(GL_ARRAY_BUFFER, boyVBO[1]);
+    // Load the boyColors array data into the buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(boyColors), boyColors, GL_STATIC_DRAW);
+
+    // Unbind the buffer to prevent accidental modification
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+
+// ----------------------------------------------------------------
+// DRAW THE BOY USING VBOs, CENTERED INSIDE THE TORI GATE
+// ----------------------------------------------------------------
+void displayBoy() {
+    glPushMatrix();
+
+    // Position the boy at the middle of the Tori gate (slightly below the middle beam)
+    glTranslatef(0.0f, -0.30f, 0.0f);
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    // Bind vertices
+    glBindBuffer(GL_ARRAY_BUFFER, boyVBO[0]);
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+
+    // Bind colors
+    glBindBuffer(GL_ARRAY_BUFFER, boyVBO[1]);
+    glColorPointer(3, GL_FLOAT, 0, 0);
+
+    glDrawArrays(GL_QUADS, 0, 32); // 6 quads * 4 vertices = 24
+
+    // Clean up
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+
+    glPopMatrix();
 }
