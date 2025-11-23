@@ -10,8 +10,14 @@ void displayToriGate();
 void displayGodzilla();
 void displayBoy();
 void initVBOs();
+void displayBirds();
 
+const int NUM_BIRDS = 15;
+const GLfloat BIRD_COLOR[] = { 0.0f, 0.0f, 0.0f }; // Black Birds
+const GLfloat BIRD_SCALE = 0.015f; // Size of each bird
 GLuint boyVBO[2];
+GLfloat birdOffsets[NUM_BIRDS * 2]; // Storage for static X and Y offsets
+
 
 // ----------------------------------------------------------------
 // DISPLAY CALLBACK
@@ -25,6 +31,7 @@ void Display() {
     displayToriGate();
     //displayGodzilla();
     displayBoy();
+    displayBirds();
     glutSwapBuffers();
 }
 
@@ -47,11 +54,26 @@ int main(int argc, char** argv) {
     }
 
     initVBOs();
+
+    //Birds call function
+    GLfloat flockSpreadX = 0.25f;
+    GLfloat flockSpreadY = 0.2f;
+
+    for (int i = 0; i < NUM_BIRDS; ++i) {
+        // Calculate random offsets only once at program startup
+        GLfloat xOffset = ((float)rand() / RAND_MAX * flockSpreadX) - (flockSpreadX / 2.0f);
+        GLfloat yOffset = ((float)rand() / RAND_MAX * flockSpreadY) - (flockSpreadY / 2.0f);
+
+        birdOffsets[i * 2] = xOffset;     // Store X offset
+        birdOffsets[i * 2 + 1] = yOffset; // Store Y offset
+    }
     glutDisplayFunc(Display);
     glutMainLoop();
 
     return 0;
 }
+
+
 
 // ----------------------------------------------------------------
 // DATA SECTION
@@ -504,4 +526,35 @@ void displayBoy() {
     glPopMatrix();
 }
 
+void displayBirds() {
+    glColor3fv(BIRD_COLOR); // Set color to black
 
+    // Coordinates for the flock placement (top right quadrant)
+    GLfloat flockCenterX = 0.6f;
+    GLfloat flockCenterY = 0.8f;
+
+    glBegin(GL_TRIANGLES);
+    // We will draw the more bird-like 'W' shape using two triangles per bird
+
+    for (int i = 0; i < NUM_BIRDS; ++i){
+        // i * 2 gives the index for the X offset
+        GLfloat xOffset = birdOffsets[i * 2];
+        // i * 2 + 1 gives the index for the Y offset
+        GLfloat yOffset = birdOffsets[i * 2 + 1];
+
+        // Base coordinates for the bird's center point
+        GLfloat birdX = flockCenterX + xOffset;
+        GLfloat birdY = flockCenterY + yOffset;
+
+        // First Wing (Left)
+        glVertex3f(birdX - BIRD_SCALE * 1.5f, birdY, 0.0f); // Left tip
+        glVertex3f(birdX, birdY + BIRD_SCALE, 0.0f); // Peak of the 'V' / body center
+        glVertex3f(birdX - BIRD_SCALE * 0.5f, birdY + BIRD_SCALE * 0.5f, 0.0f); // Inner point of left wing
+
+        // Second Wing (Right)
+        glVertex3f(birdX + BIRD_SCALE * 1.5f, birdY, 0.0f); // Right tip
+        glVertex3f(birdX, birdY + BIRD_SCALE, 0.0f); // Peak of the 'V' / body center
+        glVertex3f(birdX + BIRD_SCALE * 0.5f, birdY + BIRD_SCALE * 0.5f, 0.0f); // Inner point of right wing
+    }
+    glEnd();
+}
