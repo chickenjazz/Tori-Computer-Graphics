@@ -28,6 +28,7 @@ bool isFiring = false;
 // Start off-screen to the LEFT
 float godzillaX = 1.0f;
 float godzillaY = 0.0f;  // New variable for the shaking height
+float groundShake = 0.0f;
 
 // ----------------------------------------------------------------
 // TIMER FUNCTION (ANIMATION)
@@ -45,7 +46,8 @@ void animateGodzilla(int value) {
             // sin(godzillaX * 20.0f) creates a wave based on horizontal position.
             // 0.03f scales it down so it's a small shake, not a giant jump.
             // abs() makes it a bounce (always up) rather than up-down.
-            godzillaY = 0.01f * abs(sin(godzillaX * 20.0f));
+            godzillaY = 0.007f * abs(sin(godzillaX * 20.0f));
+            groundShake = 0.004f * abs(sin(godzillaX * 20.0f));
 
             glutPostRedisplay();
             glutTimerFunc(16, animateGodzilla, 1);
@@ -71,12 +73,12 @@ void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
+  
     glPushMatrix();
-    glTranslatef(0.0f, godzillaY, 0.0f);
+    glTranslatef(0.0f, groundShake, 0.0f);
     displayBackground();
 
     glPushMatrix();
-
     glTranslatef(godzillaX, godzillaY, 0.0f);
 
     displayGodzilla();
