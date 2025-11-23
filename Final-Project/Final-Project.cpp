@@ -25,10 +25,65 @@ GLfloat birdOffsets[NUM_BIRDS * 2];
 bool isFiring = false;
 
 // --- ANIMATION VARIABLES ---
-// Start off-screen to the LEFT
 float godzillaX = 1.0f;
-float godzillaY = 0.0f;  // New variable for the shaking height
+float godzillaY = 0.0f;
 float groundShake = 0.0f;
+
+// Cloud Animation Variables (Different speeds for parallax effect)
+float cloudOffset1 = 0.0f; // Horizon (Slowest)
+float cloudOffset2 = 0.0f; // Mid (Medium)
+float cloudOffset3 = 0.0f; // High (Fastest)
+
+// ----------------------------------------------------------------
+// HELPER: DRAW A CLOUD (Procedural Circles)
+// ----------------------------------------------------------------
+void drawCloud(float cx, float cy, float size, float offset) {
+    // 1. Apply Animation Offset
+    float finalX = cx + offset;
+
+    // 2. Infinite Wrapping Logic
+    // If cloud goes too far right (> 1.3), move it to far left (-1.3)
+    // The screen width is 2.0 (-1 to 1), so 2.6 covers the whole width plus buffer
+    while (finalX > 1.3f) {
+        finalX -= 2.6f;
+    }
+    while (finalX < -1.3f) {
+        finalX += 2.6f;
+    }
+
+    // Enable blending for soft edges
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f(0.7f, 0.8f, 1.5f, 0.15f); // White with 90% opacity
+
+    // Draw 4 overlapping circles (Top, Sides, and a wide Bottom base)
+    float offsets[6][3] = {
+        { 0.0f,  0.5f,  1.0f},   // 1. Main Top Center
+        { 0.0f,  -0.1f,  0.6f},   // 1. Main Top Center
+        {-0.75f, 0.0f,  0.75f},  // 2. Left Middle
+        { 0.75f, 0.0f,  0.75f},  // 3. Right Middle
+        {-1.5f, -0.4f, 0.3f},  // 4. Bottom Left (Creates the oblong base)
+        {1.5f, -0.4f, 0.3f},  // 4. Bottom Left (Creates the oblong base)
+    };
+
+    for (int j = 0; j < 6; j++) {
+        glBegin(GL_TRIANGLE_FAN);
+        float xPos = finalX + (offsets[j][0] * size);
+        float yPos = cy + (offsets[j][1] * size);
+        float radius = size * offsets[j][2];
+
+        glVertex2f(xPos, yPos); // Center of circle
+        for (int i = 0; i <= 20; i++) {
+            float angle = 2.0f * 3.14159f * i / 20;
+            float dx = radius * cosf(angle);
+            float dy = radius * sinf(angle);
+            glVertex2f(xPos + dx, yPos + dy);
+        }
+        glEnd();
+    }
+    glDisable(GL_BLEND);
+}
+
 
 // ----------------------------------------------------------------
 // TIMER FUNCTION (ANIMATION)
@@ -38,20 +93,22 @@ void animateGodzilla(int value) {
         glutTimerFunc(16, animateGodzilla, 1);
     }
     else if (value == 1) {
-        // Move to the RIGHT until he hits the center/right side
+        // --- 1. UPDATE CLOUDS (THIS WAS MISSING) ---
+        cloudOffset1 += 0.00005f; // Horizon moves slow
+        cloudOffset2 += 0.00008f; // Mid moves medium
+        cloudOffset3 += 0.00012f; // High moves fast
+
+        // --- 2. UPDATE GODZILLA ---
         if (godzillaX > -2.5f) {
-            godzillaX -= 0.002f; // Move Right speed
-
-            // --- WALKING SHAKE LOGIC ---
-            // sin(godzillaX * 20.0f) creates a wave based on horizontal position.
-            // 0.03f scales it down so it's a small shake, not a giant jump.
-            // abs() makes it a bounce (always up) rather than up-down.
+            godzillaX -= 0.002f;
             godzillaY = 0.007f * abs(sin(godzillaX * 20.0f));
-            groundShake = 0.004f * abs(sin(godzillaX * 20.0f));
-
-            glutPostRedisplay();
-            glutTimerFunc(16, animateGodzilla, 1);
+            groundShake = 0.002f * abs(sin(godzillaX * 20.0f));
         }
+
+        // --- 3. ALWAYS LOOP ---
+        // This must be outside the 'if' so clouds keep moving
+        glutPostRedisplay();
+        glutTimerFunc(16, animateGodzilla, 1);
     }
 }
 
@@ -67,30 +124,193 @@ void mouseCallback(int button, int state, int x, int y) {
 }
 
 // ----------------------------------------------------------------
+// DISPLAY BACKGROUND (Sky, Clouds, Blended Sea, Snow)
+// ----------------------------------------------------------------
+void displayBackground() {
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    // Settings
+    GLfloat snowFieldHeight = -0.60f;
+    GLfloat seaLevel = -0.25f;
+
+    // ------------------------------------
+    // 1. SKY GRADIENT
+    // ------------------------------------
+    GLfloat skyVertices[] = {
+        -1.0f,  1.0f, 0.0f,      // Top-Left 
+         1.0f,  1.0f, 0.0f,      // Top-Right
+         1.0f,  seaLevel, 0.0f,  // Bottom boundary
+        -1.0f,  seaLevel, 0.0f   // Bottom boundary
+    };
+    GLfloat skyColors[] = {
+        0.1f, 0.3f, 0.7f, // Top (Dark Blue)
+        0.1f, 0.3f, 0.7f,
+        0.6f, 0.7f, 0.95f, // Bottom (Light Blue - Horizon)
+        0.6f, 0.7f, 0.95f
+    };
+    glVertexPointer(3, GL_FLOAT, 0, skyVertices);
+    glColorPointer(3, GL_FLOAT, 0, skyColors);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    // ------------------------------------
+    // 2. CLOUDS (Procedural)
+    // ------------------------------------
+    // We draw these before the sea so they appear behind the horizon if low
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+
+    // LAYER 1: HORIZON (Smallest, Furthest Back)
+       // Y-positions: -0.2 to 0.1 | Size: 0.04 to 0.07
+    drawCloud(-0.95f, -0.15f, 0.04f, cloudOffset1);
+    drawCloud(0.85f, -0.12f, 0.05f, cloudOffset1);
+    drawCloud(-0.60f, -0.05f, 0.06f, cloudOffset1);
+    drawCloud(0.40f, 0.00f, 0.05f, cloudOffset1);
+    drawCloud(0.10f, -0.08f, 0.06f, cloudOffset1);
+    drawCloud(-0.25f, 0.05f, 0.07f, cloudOffset1);
+    drawCloud(0.65f, 0.08f, 0.06f, cloudOffset1);
+    drawCloud(0.30f, -0.15f, 0.05f, cloudOffset1); // Low Center-Right
+    drawCloud(-0.45f, 0.02f, 0.06f, cloudOffset1); // Mid Horizon Left
+    drawCloud(-0.80f, -0.10f, 0.05f, cloudOffset1); // Low Far Left
+    drawCloud(-0.98f, -0.05f, 0.04f, cloudOffset1); // Far edge left
+    drawCloud(0.95f, 0.02f, 0.05f, cloudOffset1); // Far edge right
+    drawCloud(-0.15f, -0.18f, 0.06f, cloudOffset1); // Low center
+    drawCloud(-0.50f, 0.32f, 0.04f, cloudOffset1); // Mid-left horizon
+    drawCloud(0.55f, -0.10f, 0.05f, cloudOffset1); // Mid-right horizon
+    drawCloud(-0.90f, -0.20f, 0.04f, cloudOffset1); // Far left bottom
+    drawCloud(0.92f, -0.18f, 0.05f, cloudOffset1); // Far right bottom
+    drawCloud(0.75f, -0.05f, 0.04f, cloudOffset1); // Mid right
+    drawCloud(-0.70f, 0.23f, 0.05f, cloudOffset1); // Mid left
+    drawCloud(1.25f, 0.18f, 0.06f, cloudOffset1); // Big Far Right
+    drawCloud(-1.25f, 0.13f, 0.08f, cloudOffset1); // Big Far Right
+    drawCloud(1.75f, -0.06f, 0.056f, cloudOffset1); // Big Far Right
+    drawCloud(-1.85f, 0.11f, 0.058f, cloudOffset1); // Big Far Right
+
+    // LAYER 2: MID-SKY (Medium Size)
+    // Y-positions: 0.2 to 0.5 | Size: 0.09 to 0.14
+    drawCloud(-0.85f, 0.30f, 0.10f, cloudOffset2);
+    drawCloud(0.90f, 0.35f, 0.11f, cloudOffset2);
+    drawCloud(0.20f, 0.40f, 0.13f, cloudOffset2);
+    drawCloud(-0.45f, 0.25f, 0.09f, cloudOffset2);
+    drawCloud(0.55f, 0.50f, 0.14f, cloudOffset2);
+    drawCloud(0.00f, 0.30f, 0.11f, cloudOffset2); // Center Mid
+    drawCloud(-0.20f, 0.45f, 0.12f, cloudOffset2); // Mid-High Left
+    drawCloud(0.70f, 0.25f, 0.10f, cloudOffset2); // Low-Mid Right
+    drawCloud(-0.68f, 0.08f, 0.12f, cloudOffset2); // Low-Mid Right
+    drawCloud(0.68f, 0.08f, 0.12f, cloudOffset2); // Low-Mid Right
+    drawCloud(-0.65f, 0.35f, 0.11f, cloudOffset2); // Left side filler
+    drawCloud(0.35f, 0.28f, 0.10f, cloudOffset2); // Right side filler
+    drawCloud(1.25f, 0.24f, 0.15f, cloudOffset3); // Big Far Right
+    drawCloud(-1.25f, 0.39f, 0.13f, cloudOffset2); // Big Far Right
+    drawCloud(1.75f, 0.41f, 0.14f, cloudOffset2); // Big Far Right
+    drawCloud(-1.85f, 0.33f, 0.11f, cloudOffset2); // Big Far Right
+
+
+    // LAYER 3: HIGH SKY (Largest, Closest/Front)
+    // Y-positions: 0.6 to 0.9 | Size: 0.18 to 0.25
+    drawCloud(-0.60f, 0.70f, 0.18f, cloudOffset3); // Big Left
+    drawCloud(0.50f, 0.80f, 0.20f, cloudOffset3); // Big Right
+    drawCloud(-0.10f, 0.85f, 0.22f, cloudOffset3); // Huge Top Center
+    drawCloud(0.85f, 0.75f, 0.19f, cloudOffset3); // Big Far Right
+    drawCloud(-0.90f, 0.60f, 0.16f, cloudOffset3); // Big Far Left
+    drawCloud(0.20f, 0.90f, 0.21f, cloudOffset3); // Huge Top Right
+    drawCloud(-0.35f, 0.55f, 0.19f, cloudOffset3); // Big Mid-Left
+    drawCloud(0.0f, 0.55f, 0.19f, cloudOffset3); // Big Mid-Left
+    drawCloud(-0.75f, 0.80f, 0.23f, cloudOffset3); // Huge Top Far Left
+    drawCloud(1.25f, 0.7f, 0.21f, cloudOffset3); // Big Far Right
+    drawCloud(-1.25f, 0.65f, 0.19f, cloudOffset3); // Big Far Right
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    // ------------------------------------
+    // 3. SEA GRADIENT (Seamless Blend)
+    // ------------------------------------
+    GLfloat seaVertices[] = {
+        -1.0f,  seaLevel, 0.0f,         // Top-Left 
+         1.0f,  seaLevel, 0.0f,         // Top-Right
+         1.0f,  snowFieldHeight, 0.0f,  // Bottom Right
+        -1.0f,  snowFieldHeight, 0.0f   // Bottom Left
+    };
+
+    // UPDATED COLORS: The Top of the sea now matches the Bottom of the sky
+    GLfloat seaColors[] = {
+        0.5f, 0.7f, 0.95f, // Top (Light Blue - Matches Sky Horizon)
+        0.5f, 0.7f, 0.95f,
+        0.1f, 0.2f, 0.5f,  // Bottom (Darker Blue - Depth near shore)
+        0.1f, 0.2f, 0.5f
+    };
+    glVertexPointer(3, GL_FLOAT, 0, seaVertices);
+    glColorPointer(3, GL_FLOAT, 0, seaColors);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    // ------------------------------------
+    // 4. TEXTURED SNOW FIELD
+    // ------------------------------------
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+
+    int numSegments = 60;
+    GLfloat segmentWidth = 2.0f / numSegments;
+    GLfloat snowBottom = -1.0f;
+
+    glBegin(GL_QUAD_STRIP);
+    for (int i = 0; i <= numSegments; ++i) {
+        GLfloat x = -1.0f + (i * segmentWidth);
+
+        // Complex Noise for rugged snow
+        GLfloat yBumpy = snowFieldHeight
+            + 0.05f * sinf(x * 3.5f)
+            + 0.02f * cosf(x * 15.0f)
+            + 0.005f * sinf(x * 50.0f);
+
+        // Height-based shading
+        float heightFactor = (yBumpy - snowFieldHeight + 0.05f) * 10.0f;
+        if (heightFactor > 1.0f) heightFactor = 1.0f;
+        if (heightFactor < 0.0f) heightFactor = 0.0f;
+
+        // Surface: Mix White with Shadow Blue
+        float r = 0.85f + (0.15f * heightFactor);
+        float g = 0.90f + (0.10f * heightFactor);
+        float b = 0.95f + (0.05f * heightFactor);
+
+        glColor3f(r, g, b);
+        glVertex3f(x, yBumpy, 0.0f);
+
+        // Underground: Darker Grey/Blue
+        glColor3f(0.7f, 0.75f, 0.85f);
+        glVertex3f(x, snowBottom, 0.0f);
+    }
+    glEnd();
+}
+
+// ----------------------------------------------------------------
 // DISPLAY CALLBACK
 // ----------------------------------------------------------------
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
-  
+    // Apply ground shake to the background
     glPushMatrix();
     glTranslatef(0.0f, groundShake, 0.0f);
     displayBackground();
 
+    // Draw Godzilla (He shakes independently)
     glPushMatrix();
     glTranslatef(godzillaX, godzillaY, 0.0f);
-
     displayGodzilla();
     if (isFiring) {
         displayFire();
     }
     glPopMatrix();
 
+    // Gate and Boy also shake with the ground
     displayToriGate();
     displayBoy();
-    glPopMatrix();
+    glPopMatrix(); // End ground shake
 
+    // Birds fly smoothly (No shake)
     displayBirds();
 
     glutSwapBuffers();
@@ -120,7 +340,7 @@ int main(int argc, char** argv) {
         birdOffsets[i * 2 + 1] = ((float)rand() / RAND_MAX * flockSpreadY) - (flockSpreadY / 2.0f);
     }
 
-    glutTimerFunc(10000, animateGodzilla, 0);
+    glutTimerFunc(1000, animateGodzilla, 0);
     glutMouseFunc(mouseCallback);
     glutDisplayFunc(Display);
     glutMainLoop();
@@ -422,72 +642,6 @@ GLfloat colors[] = {
     0.8f, 0.1f, 0.1f,  // Bottom-Right
     0.8f, 0.1f, 0.1f,  // Bottom-Left
 };
-
-// ----------------------------------------------------------------
-// DISPLAY BACKGROUND (Sky, Sea, Snow)
-// ----------------------------------------------------------------
-void displayBackground() {
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
-
-    // Settings
-    GLfloat snowFieldHeight = -0.60f;
-    GLfloat seaLevel = -0.35f;
-
-    // 1. Sky Gradient
-    GLfloat skyVertices[] = {
-        -1.0f,  1.0f, 0.0f,      // Top-Left 
-         1.0f,  1.0f, 0.0f,      // Top-Right
-         1.0f,  seaLevel, 0.0f,  // Bottom boundary
-        -1.0f,  seaLevel, 0.0f   // Bottom boundary
-    };
-    GLfloat skyColors[] = {
-        0.1f, 0.3f, 0.7f, // Top
-        0.1f, 0.3f, 0.7f,
-        0.6f, 0.7f, 0.95f, // Bottom
-        0.6f, 0.7f, 0.95f
-    };
-    glVertexPointer(3, GL_FLOAT, 0, skyVertices);
-    glColorPointer(3, GL_FLOAT, 0, skyColors);
-    glDrawArrays(GL_QUADS, 0, 4);
-
-    // 2. Sea Gradient
-    GLfloat seaVertices[] = {
-        -1.0f,  seaLevel, 0.0f,         // Top-Left
-         1.0f,  seaLevel, 0.0f,         // Top-Right
-         1.0f,  snowFieldHeight, 0.0f,  // Bottom Right
-        -1.0f,  snowFieldHeight, 0.0f   // Bottom Left
-    };
-    GLfloat seaColors[] = {
-        0.1f, 0.3f, 0.7f, // Top
-        0.1f, 0.3f, 0.7f,
-        0.2f, 0.5f, 0.8f, // Bottom
-        0.2f, 0.5f, 0.8f
-    };
-    glVertexPointer(3, GL_FLOAT, 0, seaVertices);
-    glColorPointer(3, GL_FLOAT, 0, seaColors);
-    glDrawArrays(GL_QUADS, 0, 4);
-
-    // 3. Snow Field (Procedural Bumps)
-    GLfloat snowColor[] = { 1.0f, 1.0f, 1.0f };
-    glColor3fv(snowColor);
-
-    int numSegments = 20;
-    GLfloat segmentWidth = 2.0f / numSegments;
-    GLfloat snowBottom = -1.0f;
-
-    glBegin(GL_QUAD_STRIP);
-    for (int i = 0; i <= numSegments; ++i) {
-        GLfloat x = -1.0f + (i * segmentWidth);
-        GLfloat yBumpy = snowFieldHeight + 0.05f * sinf(x * 5.0f);
-        glVertex3f(x, yBumpy, 0.0f);
-        glVertex3f(x, snowBottom, 0.0f);
-    }
-    glEnd();
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_COLOR_ARRAY);
-}
 
 // ----------------------------------------------------------------
 // DISPLAY TORII GATE (Geometry Only)
