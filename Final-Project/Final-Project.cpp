@@ -1,5 +1,6 @@
 ﻿#include <GL/glew.h>
 #include <GL/glut.h>
+#include<cmath>
 #include <iostream>
 
 using namespace std;
@@ -219,101 +220,79 @@ GLfloat backgroundColors[] = {
 };
 GLfloat snowFieldHeight = -0.60f; // This value will be used for the transition.
 GLfloat seaLevel = -0.35f; // Adjust this value to raise/lower the sea line
-GLfloat darkSkyLevel = 0.6f; // The top Y-coordinate is 1.0f. Let's make the dark sky extend down to 0.6f.
+GLfloat darkSkyLevel = 0.6f; // The top Y-coordinate is 1.0f, the dark sky extend down to 0.6f.
 
 
 void displayToriGate() {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
-    // 1.Draw the TOP Sky Gradient (Darker Blue)
-    GLfloat topSkyVertices[] = {
-        -1.0f,  1.0f, 0.0f,      // Top-Left (Full top of screen)
-         1.0f,  1.0f, 0.0f,      // Top-Right
-         1.0f,  darkSkyLevel, 0.0f,  // Bottom boundary for dark sky
-        -1.0f,  darkSkyLevel, 0.0f   // Bottom boundary for dark sky
-    };
-    GLfloat topSkyColors[] = {
-        0.1f, 0.3f, 0.7f, // Top-Left (Dark Sky Blue)
-        0.1f, 0.3f, 0.7f, // Top-Right (Dark Sky Blue)
-        0.4f, 0.6f, 1.0f, // Bottom Transition (Original Sky Color)
-        0.4f, 0.6f, 1.0f  // Bottom Transition (Original Sky Color)
-    };
-    glVertexPointer(3, GL_FLOAT, 0, topSkyVertices);
-    glColorPointer(3, GL_FLOAT, 0, topSkyColors);
-    glDrawArrays(GL_QUADS, 0, 4);
-
-    // 2. Draw the LOWER Sky Gradient
-    // This quad starts where the dark sky ends and goes down to the sea.
-    GLfloat lowerSkyVertices[] = {
-        -1.0f,  darkSkyLevel, 0.0f,  // Top-Left (Matches darkSkyLevel)
-         1.0f,  darkSkyLevel, 0.0f,  // Top-Right
-         1.0f,  seaLevel, 0.0f,      // Sea Horizon Right
-        -1.0f,  seaLevel, 0.0f       // Sea Horizon Left
-    };
-    GLfloat lowerSkyColors[] = {
-        0.4f, 0.6f, 1.0f, // Top-Left (Original Sky Color - matches bottom of dark sky)
-        0.4f, 0.6f, 1.0f, // Top-Right (Original Sky Color)
-        0.3f, 0.5f, 0.9f, // Sea Horizon Right (Slightly darker blue, transitioning to sea)
-        0.3f, 0.5f, 0.9f  // Sea Horizon Left
-    };
-    glVertexPointer(3, GL_FLOAT, 0, lowerSkyVertices);
-    glColorPointer(3, GL_FLOAT, 0, lowerSkyColors);
-    glDrawArrays(GL_QUADS, 0, 4);
-
+    // 1. Draw the SINGLE, Seamless Sky Gradient (Dark Top to Light Horizon) 
     GLfloat skyVertices[] = {
-        -1.0f,  1.0f, 0.0f,  // Top-Left
-         1.0f,  1.0f, 0.0f,  // Top-Right
-         1.0f,  snowFieldHeight, 0.0f, // Horizon Right
-        -1.0f,  snowFieldHeight, 0.0f  // Horizon Left
+        // Vertices span from Y=1.0f down to Y=seaLevel
+        -1.0f,  1.0f, 0.0f,      // Top-Left 
+         1.0f,  1.0f, 0.0f,      // Top-Right
+         1.0f,  seaLevel, 0.0f,  // Bottom boundary (Horizon)
+        -1.0f,  seaLevel, 0.0f   // Bottom boundary (Horizon)
     };
     GLfloat skyColors[] = {
-        0.4f, 0.6f, 1.0f, // Top-Left (Sky Blue)
-        0.4f, 0.6f, 1.0f, // Top-Right (Sky Blue)
-        0.6f, 0.8f, 1.0f, // Horizon Right (Lighter Blue for a softer transition)
-        0.6f, 0.8f, 1.0f  // Horizon Left (Lighter Blue)
+        // TOP: Darkest Blue
+        0.1f, 0.3f, 0.7f,
+        0.1f, 0.3f, 0.7f,
+        // BOTTOM: Lightest Blue (Horizon)
+        0.6f, 0.7f, 0.95f, 
+        0.6f, 0.7f, 0.95f   
     };
-
     glVertexPointer(3, GL_FLOAT, 0, skyVertices);
     glColorPointer(3, GL_FLOAT, 0, skyColors);
     glDrawArrays(GL_QUADS, 0, 4);
 
-    // 3. Draw the Sea Gradient (Darker Blue to Lighter Blue/Green)
+    // --- 2. Draw the Sea Gradient (Sea Horizon to Snow Horizon) ---
+    // Note: The top of the sea quad (Y=seaLevel) starts with a darker blue,
+    // creating a slight break in color from the bright sky horizon, as expected for water.
     GLfloat seaVertices[] = {
         -1.0f,  seaLevel, 0.0f,         // Top-Left (Matches sky bottom)
-         1.0f,  seaLevel, 0.0f,         // Top-Right (Matches sky bottom)
+         1.0f,  seaLevel, 0.0f,         // Top-Right
          1.0f,  snowFieldHeight, 0.0f,  // Snow Horizon Right
         -1.0f,  snowFieldHeight, 0.0f    // Snow Horizon Left
     };
     GLfloat seaColors[] = {
         0.1f, 0.3f, 0.7f, // Top-Left (Deep Sea Blue)
         0.1f, 0.3f, 0.7f, // Top-Right (Deep Sea Blue)
-        0.2f, 0.5f, 0.8f, // Snow Horizon Right (Lighter, maybe slightly greenish for shallow water)
-        0.2f, 0.5f, 0.8f  // Snow Horizon Left (Lighter, maybe slightly greenish for shallow water)
+        0.2f, 0.5f, 0.8f, // Snow Horizon Right
+        0.2f, 0.5f, 0.8f  // Snow Horizon Left
     };
     glVertexPointer(3, GL_FLOAT, 0, seaVertices);
     glColorPointer(3, GL_FLOAT, 0, seaColors);
     glDrawArrays(GL_QUADS, 0, 4);
 
-    GLfloat snowVertices[] = {
-        -1.0f,  snowFieldHeight, 0.0f, // Top-Left (Horizon Left)
-         1.0f,  snowFieldHeight, 0.0f, // Top-Right (Horizon Right)
-         1.0f, -1.0f, 0.0f,  // Bottom-Right
-        -1.0f, -1.0f, 0.0f   // Bottom-Left
-    };
-    GLfloat snowColors[] = {
-        1.0f, 1.0f, 1.0f, // Top-Left (White)
-        1.0f, 1.0f, 1.0f, // Top-Right (White)
-        1.0f, 1.0f, 1.0f, // Bottom-Right (White)
-        1.0f, 1.0f, 1.0f  // Bottom-Left (White)
-    };
-    glVertexPointer(3, GL_FLOAT, 0, snowVertices);
-    glColorPointer(3, GL_FLOAT, 0, snowColors);
-    glDrawArrays(GL_QUADS, 0, 4);
+    // --- 3. Draw the Snowy Field (Snow Horizon to Bottom) ---
+   GLfloat snowColor[] = {1.0f, 1.0f, 1.0f};
+    glColor3fv(snowColor); // Set the global color state for white snow
 
+    // Number of segments for the bumps
+    int numSegments = 20; 
+    GLfloat segmentWidth = 2.0f / numSegments;
+    GLfloat snowBottom = -1.0f;
+    
+    glBegin(GL_QUAD_STRIP);
+    for (int i = 0; i <= numSegments; ++i) {
+        GLfloat x = -1.0f + (i * segmentWidth);
+        
+        // Use a sine function to create the wavy, bumpy surface
+        GLfloat yBumpy = snowFieldHeight + 0.05f * sinf(x * 5.0f); 
+        
+        // Vertex 1: Top, Bumpy Edge
+        glVertex3f(x, yBumpy, 0.0f);
+        
+        // Vertex 2: Bottom, Flat Edge
+        glVertex3f(x, snowBottom, 0.0f);
+    }
+    glEnd();
+
+    // --- 4. Draw the Tori Gate ---
     glVertexPointer(3, GL_FLOAT, 0, toriGateVertices);
     glColorPointer(3, GL_FLOAT, 0, colors);
-    // Draw 32 vertices (8 parts * 4 vertices per quad)
     glDrawArrays(GL_QUADS, 0, 48);
 
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -442,35 +421,35 @@ GLfloat boyColors[] = {
     1.0f, 0.8f, 0.6f,
     1.0f, 0.8f, 0.6f,
 
-    // 2. BODY (Blue Shirt) - 4
-    0.2f, 0.4f, 0.8f,
-    0.2f, 0.4f, 0.8f,
-    0.2f, 0.4f, 0.8f,
-    0.2f, 0.4f, 0.8f,
+    // 2. BODY - 4
+    1.00f, 0.60f, 0.00f,
+    1.00f, 0.60f, 0.00f,
+    1.00f, 0.60f, 0.00f,
+    1.00f, 0.60f, 0.00f,
 
-    // 3. LEFT ARM (Blue) - 4
-    0.2f, 0.4f, 0.8f,
-    0.2f, 0.4f, 0.8f,
-    0.2f, 0.4f, 0.8f,
-    0.2f, 0.4f, 0.8f,
+    // 3. LEFT ARM  - 4
+     1.00f, 0.60f, 0.00f,
+    1.00f, 0.60f, 0.00f,
+    1.00f, 0.60f, 0.00f,
+    1.00f, 0.60f, 0.00f,
 
-    // 4. RIGHT ARM (Blue) - 4
-    0.2f, 0.4f, 0.8f,
-    0.2f, 0.4f, 0.8f,
-    0.2f, 0.4f, 0.8f,
-    0.2f, 0.4f, 0.8f,
+    // 4. RIGHT ARM  - 4
+    1.00f, 0.60f, 0.00f,
+    1.00f, 0.60f, 0.00f,
+    1.00f, 0.60f, 0.00f,
+    1.00f, 0.60f, 0.00f,
 
     // 5. LEFT LEG (Brown Pants) - 4
-    0.4f, 0.25f, 0.1f,
-    0.4f, 0.25f, 0.1f,
-    0.4f, 0.25f, 0.1f,
-    0.4f, 0.25f, 0.1f,
+    0.8f, 0.8f, 0.75f,
+    0.8f, 0.8f, 0.75f,
+    0.8f, 0.8f, 0.75f,
+    0.8f, 0.8f, 0.75f,
 
     // 6. RIGHT LEG (Brown Pants) - 4
-    0.4f, 0.25f, 0.1f,
-    0.4f, 0.25f, 0.1f,
-    0.4f, 0.25f, 0.1f,
-    0.4f, 0.25f, 0.1f,
+    0.8f, 0.8f, 0.75f,
+    0.8f, 0.8f, 0.75f,
+    0.8f, 0.8f, 0.75f,
+    0.8f, 0.8f, 0.75f,
 };
 
 // ----------------------------------------------------------------
@@ -502,7 +481,7 @@ void displayBoy() {
     glPushMatrix();
 
     // Position the boy at the middle of the Tori gate (slightly below the middle beam)
-    glTranslatef(0.0f, -0.30f, 0.0f);
+    glTranslatef(0.0f, -0.40f, 0.0f);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
@@ -515,7 +494,7 @@ void displayBoy() {
     glBindBuffer(GL_ARRAY_BUFFER, boyVBO[1]);
     glColorPointer(3, GL_FLOAT, 0, 0);
 
-    glDrawArrays(GL_QUADS, 0, 32); // 6 quads * 4 vertices = 24
+    glDrawArrays(GL_QUADS, 0, 32); 
 
     // Clean up
     glBindBuffer(GL_ARRAY_BUFFER, 0);
