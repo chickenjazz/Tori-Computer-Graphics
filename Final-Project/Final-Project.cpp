@@ -19,7 +19,7 @@ void animateGodzilla(int value);
 
 const int NUM_BIRDS = 15;
 const GLfloat BIRD_COLOR[] = { 0.0f, 0.0f, 0.0f };
-const GLfloat BIRD_SCALE = 0.015f;
+const GLfloat BIRD_SCALE = 0.020f;
 GLuint boyVBO[2];
 GLfloat birdOffsets[NUM_BIRDS * 2];
 
@@ -951,52 +951,116 @@ void displayGodzilla() {
 // ----------------------------------------------------------------
 // BOY OBJECT
 // ----------------------------------------------------------------
+// ----------------------------------------------------------------
+// BOY OBJECT (Layered Hair, Thinner Body, Shorter Legs - 52 Vertices)
+// ----------------------------------------------------------------
 GLfloat boyVertices[] = {
-    // 1. HEAD
-    -0.025f,  0.07f, 0.0f,  // Top-Left
-     0.025f,  0.07f, 0.0f,  // Top-Right
-     0.025f, -0.01f, 0.0f,  // Bottom-Right
+    // 1. HEAD (Skin)
+    -0.035f,  0.03f, 0.0f,  // Top-Left 
+     0.035f,  0.03f, 0.0f,  // Top-Right
+     0.035f, -0.04f, 0.0f,  // Bottom-Right
+    -0.035f, -0.04f, 0.0f,  // Bottom-Left
+
+    // 2. HAIR TOP VOLUME - Main block
+    -0.045f,  0.08f, 0.0f,  // Top-Left 
+     0.045f,  0.08f, 0.0f,  // Top-Right
+     0.045f,  0.03f, 0.0f,  // Bottom-Right (Aligns with head top)
+    -0.045f,  0.03f, 0.0f,  // Bottom-Left
+
+    // 3. HAIR BACK LAYER
+    -0.040f,  0.04f, 0.0f,  // Top-Left (Slightly overlaps main hair)
+     0.040f,  0.04f, 0.0f,  // Top-Right
+     0.025f, -0.01f, 0.0f,  // Bottom-Right (Tapered in towards the center)
     -0.025f, -0.01f, 0.0f,  // Bottom-Left
-    // 2. BODY
-    -0.03f,  0.0f,  0.0f,   // Top-Left
-     0.03f,  0.0f,  0.0f,   // Top-Right
-     0.03f, -0.12f, 0.0f,   // Bottom-Right
-    -0.03f, -0.12f, 0.0f,   // Bottom-Left
-    // 3. LEFT ARM
-    -0.065f,  0.0f,  0.0f,  // Top-Left
-    -0.03f,   0.0f,  0.0f,  // Top-Right
-    -0.03f,  -0.08f, 0.0f,  // Bottom-Right
-    -0.065f, -0.08f, 0.0f,  // Bottom-Left
-    // 4. RIGHT ARM
-     0.03f,  0.0f,  0.0f,   // Top-Left
-     0.065f, 0.0f,  0.0f,   // Top-Right
-     0.065f, -0.08f, 0.0f,  // Bottom-Right
-     0.03f, -0.08f, 0.0f,   // Bottom-Left
-     // 5. Left leg
-     -0.03f,  -0.12f, 0.0f,  // Top-Left
-     -0.0f,   -0.12f, 0.0f,  // Top-Right
-     -0.0f,   -0.25f, 0.0f,  // Bottom-Right
-     -0.03f,  -0.25f, 0.0f,  // Bottom-Left
-     // 6. Right leg
-      0.0f,  -0.12f, 0.0f,   // Top-Left
-      0.03f, -0.12f, 0.0f,   // Top-Right
-      0.03f, -0.25f, 0.0f,   // Bottom-Right
-      0.0f,  -0.25f, 0.0f,   // Bottom-Left
+
+    // 4. NECK (Skin)
+    -0.015f, -0.04f, 0.0f,  // Top-Left
+     0.015f, -0.04f, 0.0f,  // Top-Right
+     0.015f, -0.06f, 0.0f,  // Bottom-Right
+    -0.015f, -0.06f, 0.0f,  // Bottom-Left
+
+    // 5. BODY
+    -0.04f,  -0.06f, 0.0f,  // Top-Left 
+     0.04f,  -0.06f, 0.0f,  // Top-Right
+     0.04f,  -0.18f, 0.0f,  // Bottom-Right 
+    -0.04f,  -0.18f, 0.0f,  // Bottom-Left
+
+    // 6. LEFT ARM 
+    -0.07f,  -0.06f, 0.0f,  // Top-Left 
+    -0.04f,  -0.06f, 0.0f,  // Top-Right 
+    -0.04f,  -0.13f, 0.0f,  // Bottom-Right
+    -0.07f,  -0.13f, 0.0f,  // Bottom-Left
+
+    // 7. RIGHT ARM 
+     0.04f,  -0.06f, 0.0f,  // Top-Left 
+     0.07f,  -0.06f, 0.0f,  // Top-Right 
+     0.07f,  -0.13f, 0.0f,  // Bottom-Right
+     0.04f,  -0.13f, 0.0f,  // Bottom-Left
+
+     // 8. LEFT HAND (Skin)
+     -0.07f,  -0.13f, 0.0f,  // Top-Left
+     -0.05f,  -0.13f, 0.0f,  // Top-Right
+     -0.05f,  -0.15f, 0.0f,  // Bottom-Right
+     -0.07f,  -0.15f, 0.0f,  // Bottom-Left
+
+     // 9. RIGHT HAND (Skin)
+      0.05f,  -0.13f, 0.0f,  // Top-Left
+      0.07f,  -0.13f, 0.0f,  // Top-Right
+      0.07f,  -0.15f, 0.0f,  // Bottom-Right
+      0.05f,  -0.15f, 0.0f,  // Bottom-Left
+
+     // 10. LEFT LEG (Shorter)
+     -0.04f, -0.18f, 0.0f, // Top-Left 
+     -0.01f, -0.18f, 0.0f, // Top-Right 
+     -0.01f, -0.28f, 0.0f, // Bottom-Right 
+     -0.04f, -0.28f, 0.0f, // Bottom-Left
+
+     // 11. RIGHT LEG (Shorter)
+      0.01f, -0.18f, 0.0f, // Top-Left 
+      0.04f, -0.18f, 0.0f, // Top-Right 
+      0.04f, -0.28f, 0.0f, // Bottom-Right
+      0.01f, -0.28f, 0.0f, // Bottom-Left
+
+     // 12. LEFT SHOE 
+     -0.04f, -0.28f, 0.0f, // Top-Left
+     -0.01f, -0.28f, 0.0f, // Top-Right
+     -0.01f, -0.30f, 0.0f, // Bottom-Right
+     -0.05f, -0.30f, 0.0f, // Bottom-Left
+
+     // 13. RIGHT SHOE 
+      0.01f, -0.28f, 0.0f, // Top-Left
+      0.04f, -0.28f, 0.0f, // Top-Right
+      0.05f, -0.30f, 0.0f, // Bottom-Right
+      0.01f, -0.30f, 0.0f, // Bottom-Left
 };
 
 GLfloat boyColors[] = {
-    // 1. HEAD (Skin)
-    1.0f, 0.8f, 0.6f, 1.0f, 0.8f, 0.6f, 1.0f, 0.8f, 0.6f, 1.0f, 0.8f, 0.6f,
-    // 2. BODY
-    1.00f, 0.60f, 0.00f, 1.00f, 0.60f, 0.00f, 1.00f, 0.60f, 0.00f, 1.00f, 0.60f, 0.00f,
-    // 3. LEFT ARM
-    1.00f, 0.60f, 0.00f, 1.00f, 0.60f, 0.00f, 1.00f, 0.60f, 0.00f, 1.00f, 0.60f, 0.00f,
-    // 4. RIGHT ARM
-    1.00f, 0.60f, 0.00f, 1.00f, 0.60f, 0.00f, 1.00f, 0.60f, 0.00f, 1.00f, 0.60f, 0.00f,
-    // 5. LEFT LEG
-    0.8f, 0.8f, 0.75f, 0.8f, 0.8f, 0.75f, 0.8f, 0.8f, 0.75f, 0.8f, 0.8f, 0.75f,
-    // 6. RIGHT LEG
-    0.8f, 0.8f, 0.75f, 0.8f, 0.8f, 0.75f, 0.8f, 0.8f, 0.75f, 0.8f, 0.8f, 0.75f,
+    // 1. HEAD (Skin Tone)
+    0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f,
+    // 2. HAIR (TOP VOLUME - Dark Purple/Brown)
+    0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f,
+    // 3. HAIR (BACK LAYER - Same Dark Hair Color) 
+    0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f,
+    // 4. NECK (Skin Tone)
+    0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f,
+    // 5. BODY (Maroon/Reddish-Purple Shirt)
+    0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f,
+    // 6. LEFT ARM (Maroon/Reddish-Purple Shirt)
+    0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f,
+    // 7. RIGHT ARM (Maroon/Reddish-Purple Shirt)
+    0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f,
+    // 8. LEFT HAND (Skin Tone)
+    0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f,
+    // 9. RIGHT HAND (Skin Tone)
+    0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f,
+    // 10. LEFT LEG (Blue Jeans)
+    0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f,
+    // 11. RIGHT LEG (Blue Jeans)
+    0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f,
+    // 12. LEFT SHOE (Dark Red/Purple)
+    0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f,
+    // 13. RIGHT SHOE (Dark Red/Purple)
+    0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f,
 };
 
 void initVBOs() {
@@ -1017,7 +1081,7 @@ void displayBoy() {
     glVertexPointer(3, GL_FLOAT, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, boyVBO[1]);
     glColorPointer(3, GL_FLOAT, 0, 0);
-    glDrawArrays(GL_QUADS, 0, 32);
+    glDrawArrays(GL_QUADS, 0, 52);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
