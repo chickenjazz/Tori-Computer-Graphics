@@ -1,17 +1,18 @@
 ﻿#include <GL/glew.h>
 #include <GL/glut.h>
-#include<cmath>
+#include <cmath>
 #include <iostream>
 
 using namespace std;
 
 // PROTOTYPES
-
 void displayToriGate();
 void displayGodzilla();
+void displayFire();
 void displayBoy();
 void initVBOs();
 void displayBirds();
+void mouseCallback(int button, int state, int x, int y);
 
 const int NUM_BIRDS = 15;
 const GLfloat BIRD_COLOR[] = { 0.0f, 0.0f, 0.0f }; // Black Birds
@@ -19,6 +20,22 @@ const GLfloat BIRD_SCALE = 0.015f; // Size of each bird
 GLuint boyVBO[2];
 GLfloat birdOffsets[NUM_BIRDS * 2]; // Storage for static X and Y offsets
 
+bool isFiring = false;
+
+// ----------------------------------------------------------------
+// MOUSE CALLBACK
+// ----------------------------------------------------------------
+void mouseCallback(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON) {
+        if (state == GLUT_DOWN) {
+            isFiring = true;
+        }
+        else if (state == GLUT_UP) {
+            isFiring = false;
+        }
+        glutPostRedisplay();
+    }
+}
 
 // ----------------------------------------------------------------
 // DISPLAY CALLBACK
@@ -28,10 +45,19 @@ void Display() {
 
     // Reset transformations
     glLoadIdentity();
+
     displayToriGate();
+
     displayGodzilla();
+
+    if (isFiring) {
+        displayFire();
+    }
+
     displayBoy();
+    
     displayBirds();
+
     glutSwapBuffers();
 }
 
@@ -67,13 +93,13 @@ int main(int argc, char** argv) {
         birdOffsets[i * 2] = xOffset;     // Store X offset
         birdOffsets[i * 2 + 1] = yOffset; // Store Y offset
     }
+
+    glutMouseFunc(mouseCallback);
     glutDisplayFunc(Display);
     glutMainLoop();
 
     return 0;
 }
-
-
 
 // ----------------------------------------------------------------
 // DATA SECTION
@@ -160,165 +186,160 @@ GLfloat toriGateVertices[] = {
      0.3f,  -0.7f,   0.0f,  // Bottom-Right
      0.23f, -0.7f,   0.0f,  // Bottom-Left
 
-    // ---------------------------------------------------------
-    // 13. Pillar detail lower left
-    // ---------------------------------------------------------
-    -0.22f,  0.13f,  0.0f,  // Top-Left
-     -0.11f,  0.13f,  0.0f,  // Top-Right
-     -0.13f,  0.09f,  0.0f,  // Bottom-Right
-    -0.2f,  0.09f,  0.0f,  // Bottom-Left
-
-    // ---------------------------------------------------------
-    // 14. Pillar detail lower right
-    // ---------------------------------------------------------
-         0.22f, 0.13f, 0.0f,  // Top-Left
-         0.11f, 0.13f, 0.0f,  // Top-Right
-         0.13f, 0.09f, 0.0f,  // Bottom-Right
-         0.2f, 0.09f, 0.0f,  // Bottom-Left
-
-    // ---------------------------------------------------------
-    // 15. Pillar detail upper left
-    // ---------------------------------------------------------
-         -0.21f, 0.2f, 0.0f,  // Top-Left
-         -0.12f, 0.2f, 0.0f,  // Top-Right
-         -0.12f, 0.16f, 0.0f,  // Bottom-Right
-         -0.21f, 0.16f, 0.0f,  // Bottom-Left
+     // ---------------------------------------------------------
+     // 13. Pillar detail lower left
+     // ---------------------------------------------------------
+     -0.22f,  0.13f,  0.0f,  // Top-Left
+      -0.11f,  0.13f,  0.0f,  // Top-Right
+      -0.13f,  0.09f,  0.0f,  // Bottom-Right
+     -0.2f,  0.09f,  0.0f,  // Bottom-Left
 
      // ---------------------------------------------------------
-     // 16. Pillar detail upper right
+     // 14. Pillar detail lower right
      // ---------------------------------------------------------
-        0.21f, 0.2f, 0.0f,  // Top-Left
-        0.12f, 0.2f, 0.0f,  // Top-Right
-        0.12f, 0.16f, 0.0f,  // Bottom-Right
-        0.21f, 0.16f, 0.0f,  // Bottom-Left
+           0.22f, 0.13f, 0.0f,  // Top-Left
+           0.11f, 0.13f, 0.0f,  // Top-Right
+           0.13f, 0.09f, 0.0f,  // Bottom-Right
+           0.2f, 0.09f, 0.0f,  // Bottom-Left
 
-    // ---------------------------------------------------------
-    // 17. left side pillar roof
-    // ---------------------------------------------------------
-         -0.32f, -0.1f, 0.0f,  // Top-Left
-         -0.21f, -0.1f, 0.0f,  // Top-Right
-         -0.23f, -0.06f, 0.0f,  // Bottom-Right
-         -0.3f, -0.06f, 0.0f,  // Bottom-Left
+           // ---------------------------------------------------------
+           // 15. Pillar detail upper left
+           // ---------------------------------------------------------
+                 -0.21f, 0.2f, 0.0f,  // Top-Left
+                 -0.12f, 0.2f, 0.0f,  // Top-Right
+                 -0.12f, 0.16f, 0.0f,  // Bottom-Right
+                 -0.21f, 0.16f, 0.0f,  // Bottom-Left
 
-    // ---------------------------------------------------------
-    // 17. right side pillar roof
-    // ---------------------------------------------------------
-         0.32f, -0.1f, 0.0f,  // Top-Left
-         0.21f, -0.1f, 0.0f,  // Top-Right
-         0.23f, -0.06f, 0.0f,  // Bottom-Right
-         0.3f, -0.06f, 0.0f,  // Bottom-Left
+                 // ---------------------------------------------------------
+                 // 16. Pillar detail upper right
+                 // ---------------------------------------------------------
+                     0.21f, 0.2f, 0.0f,  // Top-Left
+                     0.12f, 0.2f, 0.0f,  // Top-Right
+                     0.12f, 0.16f, 0.0f,  // Bottom-Right
+                     0.21f, 0.16f, 0.0f,  // Bottom-Left
 
-         // ---------------------------------------------------------
-    // 1. TOP BLACK ROOF (Kasagi)
-    // ---------------------------------------------------------
-          -0.39f, 0.3f, 0.0f,  // Top-Left
-          0.39f, 0.3f, 0.0f,  // Top-Right
-          0.37f, 0.25f, 0.0f,  // Bottom-Right
-          -0.37f, 0.25f, 0.0f,  // Bottom-Left
+                     // ---------------------------------------------------------
+                     // 17. left side pillar roof
+                     // ---------------------------------------------------------
+                           -0.32f, -0.1f, 0.0f,  // Top-Left
+                           -0.21f, -0.1f, 0.0f,  // Top-Right
+                           -0.23f, -0.06f, 0.0f,  // Bottom-Right
+                           -0.3f, -0.06f, 0.0f,  // Bottom-Left
 
-          // ---------------------------------------------------------
-          // 2. UPPER RED BEAM (Shimaki)
-          // ---------------------------------------------------------
-          -0.35f, 0.25f, 0.0f,  // Top-Left
-          0.35f, 0.25f, 0.0f,  // Top-Right
-          0.33f, 0.19f, 0.0f,  // Bottom-Right
-          -0.33f, 0.19f, 0.0f,  // Bottom-Left
+                           // ---------------------------------------------------------
+                           // 17. right side pillar roof
+                           // ---------------------------------------------------------
+                                 0.32f, -0.1f, 0.0f,  // Top-Left
+                                 0.21f, -0.1f, 0.0f,  // Top-Right
+                                 0.23f, -0.06f, 0.0f,  // Bottom-Right
+                                 0.3f, -0.06f, 0.0f,  // Bottom-Left
 
+                                 // ---------------------------------------------------------
+                            // 1. TOP BLACK ROOF (Kasagi)
+                            // ---------------------------------------------------------
+                                  -0.39f, 0.3f, 0.0f,  // Top-Left
+                                  0.39f, 0.3f, 0.0f,  // Top-Right
+                                  0.37f, 0.25f, 0.0f,  // Bottom-Right
+                                  -0.37f, 0.25f, 0.0f,  // Bottom-Left
 
-
+                                  // ---------------------------------------------------------
+                                  // 2. UPPER RED BEAM (Shimaki)
+                                  // ---------------------------------------------------------
+                                  -0.35f, 0.25f, 0.0f,  // Top-Left
+                                  0.35f, 0.25f, 0.0f,  // Top-Right
+                                  0.33f, 0.19f, 0.0f,  // Bottom-Right
+                                  -0.33f, 0.19f, 0.0f,  // Bottom-Left
 };
 
-    GLfloat colors[] = {
-        
+GLfloat colors[] = {
+    // ---------------------------------------------------------
+    // 3. LEFT PILLAR (Hashira)
+    // ---------------------------------------------------------
+    0.3f, 0.0f, 0.0f,  // Top-Left
+    0.8f, 0.1f, 0.1f,  // Top-Right
+    0.8f, 0.1f, 0.1f,  // Bottom-Right
+    0.3f, 0.0f, 0.0f,  // Bottom-Left
 
-        // ---------------------------------------------------------
-        // 3. LEFT PILLAR (Hashira)
-        // ---------------------------------------------------------
-        0.3f, 0.0f, 0.0f,  // Top-Left
-        0.8f, 0.1f, 0.1f,  // Top-Right
-        0.8f, 0.1f, 0.1f,  // Bottom-Right
-        0.3f, 0.0f, 0.0f,  // Bottom-Left
+    // ---------------------------------------------------------
+    // 4. RIGHT PILLAR (Hashira)
+    // ---------------------------------------------------------
+    0.8f, 0.1f, 0.1f,  // Top-Left
+    0.3f, 0.0f, 0.0f,  // Top-Right
+    0.3f, 0.0f, 0.0f,  // Bottom-Right
+    0.8f, 0.1f, 0.1f,  // Bottom-Left
 
-        // ---------------------------------------------------------
-        // 4. RIGHT PILLAR (Hashira)
-        // ---------------------------------------------------------
-        0.8f, 0.1f, 0.1f,  // Top-Left
-        0.3f, 0.0f, 0.0f,  // Top-Right
+    // ---------------------------------------------------------
+    // 5. LOWER BEAM (Nuki)
+    // ---------------------------------------------------------
+    0.3f, 0.0f, 0.0f,  // Top-Left
+    0.3f, 0.0f, 0.0f,  // Top-Right
+    0.8f, 0.1f, 0.1f,  // Bottom-Right
+    0.8f, 0.1f, 0.1f,  // Bottom-Left
+
+    // ---------------------------------------------------------
+    // 6. MIDDLE STRUT (Gakuzuka)
+    // ---------------------------------------------------------
+    0.6f, 0.0f, 0.0f,  // Top-Left
+    0.5f, 0.0f, 0.0f,  // Top-Right
+    0.6f, 0.0f, 0.0f,  // Bottom-Right
+    0.5f, 0.0f, 0.0f,  // Bottom-Left
+
+
+    // ---------------------------------------------------------
+    // 9. CONNECTOR LEFT TOP
+    // ---------------------------------------------------------
+    0.3f, 0.0f, 0.0f,  // Top-Left
+    0.8f, 0.1f, 0.1f,  // Top-Right
+    0.8f, 0.1f, 0.1f,  // Bottom-Right
+    0.3f, 0.0f, 0.0f,  // Bottom-Left
+
+    // ---------------------------------------------------------
+    // 10. CONNECTOR LEFT BOTTOM
+    // ---------------------------------------------------------
+    0.3f, 0.0f, 0.0f,  // Top-Left
+    0.8f, 0.1f, 0.1f,  // Top-Right
+    0.8f, 0.1f, 0.1f,  // Bottom-Right
+    0.3f, 0.0f, 0.0f,  // Bottom-Left
+
+    // ---------------------------------------------------------
+    // 11. CONNECTOR RIGHT TOP
+    // ---------------------------------------------------------
+    0.3f, 0.0f, 0.0f,  // Top-Left
+    0.8f, 0.1f, 0.1f,  // Top-Right
+    0.8f, 0.1f, 0.1f,  // Bottom-Right
+    0.3f, 0.0f, 0.0f,  // Bottom-Left
+
+    // ---------------------------------------------------------
+    // 12. CONNECTOR RIGHT BOTTOM
+    // ---------------------------------------------------------
+    0.3f, 0.0f, 0.0f,  // Top-Left
+    0.8f, 0.1f, 0.1f,  // Top-Right
+    0.8f, 0.1f, 0.1f,  // Bottom-Right
+    0.3f, 0.0f, 0.0f,  // Bottom-Left
+
+    // ---------------------------------------------------------
+    // 7. SMALL LEFT PILLAR
+    // ---------------------------------------------------------
+    0.3f, 0.0f, 0.0f,  // Top-Left
+    0.8f, 0.1f, 0.1f,  // Top-Right
+    0.8f, 0.1f, 0.1f,  // Bottom-Right
+    0.3f, 0.0f, 0.0f,  // Bottom-Left
+
+    // ---------------------------------------------------------
+    // 8. SMALL RIGHT PILLAR
+    // ---------------------------------------------------------
+    0.8f, 0.1f, 0.1f,  // Top-Left
+    0.3f, 0.0f, 0.0f,  // Top-Right
+    0.3f, 0.0f, 0.0f,  // Bottom-Right
+    0.8f, 0.1f, 0.1f,  // Bottom-Left
+
+    // ---------------------------------------------------------
+    // 13. LEFT LOWER DETAIL
+    // ---------------------------------------------------------
+    0.8f, 0.1f, 0.1f,  // Top-Left
+    0.8f, 0.1f, 0.1f,  // Top-Right
         0.3f, 0.0f, 0.0f,  // Bottom-Right
-        0.8f, 0.1f, 0.1f,  // Bottom-Left
-
-        // ---------------------------------------------------------
-        // 5. LOWER BEAM (Nuki)
-        // ---------------------------------------------------------
-        0.3f, 0.0f, 0.0f,  // Top-Left
-        0.3f, 0.0f, 0.0f,  // Top-Right
-        0.8f, 0.1f, 0.1f,  // Bottom-Right
-        0.8f, 0.1f, 0.1f,  // Bottom-Left
-
-        // ---------------------------------------------------------
-        // 6. MIDDLE STRUT (Gakuzuka)
-        // ---------------------------------------------------------
-        0.6f, 0.0f, 0.0f,  // Top-Left
-        0.5f, 0.0f, 0.0f,  // Top-Right
-        0.6f, 0.0f, 0.0f,  // Bottom-Right
-        0.5f, 0.0f, 0.0f,  // Bottom-Left
-
-
-        // ---------------------------------------------------------
-        // 9. CONNECTOR LEFT TOP
-        // ---------------------------------------------------------
-        0.3f, 0.0f, 0.0f,  // Top-Left
-        0.8f, 0.1f, 0.1f,  // Top-Right
-        0.8f, 0.1f, 0.1f,  // Bottom-Right
         0.3f, 0.0f, 0.0f,  // Bottom-Left
-
-        // ---------------------------------------------------------
-        // 10. CONNECTOR LEFT BOTTOM
-        // ---------------------------------------------------------
-        0.3f, 0.0f, 0.0f,  // Top-Left
-        0.8f, 0.1f, 0.1f,  // Top-Right
-        0.8f, 0.1f, 0.1f,  // Bottom-Right
-        0.3f, 0.0f, 0.0f,  // Bottom-Left
-
-        // ---------------------------------------------------------
-        // 11. CONNECTOR RIGHT TOP
-        // ---------------------------------------------------------
-        0.3f, 0.0f, 0.0f,  // Top-Left
-        0.8f, 0.1f, 0.1f,  // Top-Right
-        0.8f, 0.1f, 0.1f,  // Bottom-Right
-        0.3f, 0.0f, 0.0f,  // Bottom-Left
-
-        // ---------------------------------------------------------
-        // 12. CONNECTOR RIGHT BOTTOM
-        // ---------------------------------------------------------
-        0.3f, 0.0f, 0.0f,  // Top-Left
-        0.8f, 0.1f, 0.1f,  // Top-Right
-        0.8f, 0.1f, 0.1f,  // Bottom-Right
-        0.3f, 0.0f, 0.0f,  // Bottom-Left
-
-        // ---------------------------------------------------------
-        // 7. SMALL LEFT PILLAR
-        // ---------------------------------------------------------
-        0.3f, 0.0f, 0.0f,  // Top-Left
-        0.8f, 0.1f, 0.1f,  // Top-Right
-        0.8f, 0.1f, 0.1f,  // Bottom-Right
-        0.3f, 0.0f, 0.0f,  // Bottom-Left
-
-        // ---------------------------------------------------------
-        // 8. SMALL RIGHT PILLAR
-        // ---------------------------------------------------------
-        0.8f, 0.1f, 0.1f,  // Top-Left
-        0.3f, 0.0f, 0.0f,  // Top-Right
-        0.3f, 0.0f, 0.0f,  // Bottom-Right
-        0.8f, 0.1f, 0.1f,  // Bottom-Left
-
-        // ---------------------------------------------------------
-        // 13. LEFT LOWER DETAIL
-        // ---------------------------------------------------------
-        0.8f, 0.1f, 0.1f,  // Top-Left
-        0.8f, 0.1f, 0.1f,  // Top-Right
-            0.3f, 0.0f, 0.0f,  // Bottom-Right
-            0.3f, 0.0f, 0.0f,  // Bottom-Left
 
         // ---------------------------------------------------------
         // 14. RIGHT LOWER DETAIL
@@ -344,38 +365,38 @@ GLfloat toriGateVertices[] = {
             0.8f, 0.1f, 0.1f,  // Bottom-Right
             0.8f, 0.1f, 0.1f,  // Bottom-Left
 
-        // ---------------------------------------------------------
-        // 17. ROOF SIDE PILLAR LEFT (Black)
-        // ---------------------------------------------------------
-        0.0f, 0.0f, 0.0f,  // Top-Left
-        0.0f, 0.0f, 0.0f,  // Top-Right
-        0.0f, 0.0f, 0.0f,  // Bottom-Right
-        0.0f, 0.0f, 0.0f,  // Bottom-Left
-
-        // ---------------------------------------------------------
-        // 18. ROOF SIDE PILLAR RIGHT (Black)
-        // ---------------------------------------------------------
-        0.0f, 0.0f, 0.0f,  // Top-Left
-        0.0f, 0.0f, 0.0f,  // Top-Right
-        0.0f, 0.0f, 0.0f,  // Bottom-Right
-        0.0f, 0.0f, 0.0f,  // Bottom-Left
-
-        // ---------------------------------------------------------
-        // 1. TOP BLACK ROOF (Kasagi)
-        // ---------------------------------------------------------
+            // ---------------------------------------------------------
+            // 17. ROOF SIDE PILLAR LEFT (Black)
+            // ---------------------------------------------------------
             0.0f, 0.0f, 0.0f,  // Top-Left
             0.0f, 0.0f, 0.0f,  // Top-Right
             0.0f, 0.0f, 0.0f,  // Bottom-Right
             0.0f, 0.0f, 0.0f,  // Bottom-Left
 
             // ---------------------------------------------------------
-            // 2. UPPER RED BEAM (Shimaki)
+            // 18. ROOF SIDE PILLAR RIGHT (Black)
             // ---------------------------------------------------------
-            0.3f, 0.0f, 0.0f,  // Top-Left
-            0.3f, 0.0f, 0.0f,  // Top-Right
-            0.8f, 0.1f, 0.1f,  // Bottom-Right
-            0.8f, 0.1f, 0.1f,  // Bottom-Left
-    };
+            0.0f, 0.0f, 0.0f,  // Top-Left
+            0.0f, 0.0f, 0.0f,  // Top-Right
+            0.0f, 0.0f, 0.0f,  // Bottom-Right
+            0.0f, 0.0f, 0.0f,  // Bottom-Left
+
+            // ---------------------------------------------------------
+            // 1. TOP BLACK ROOF (Kasagi)
+            // ---------------------------------------------------------
+                0.0f, 0.0f, 0.0f,  // Top-Left
+                0.0f, 0.0f, 0.0f,  // Top-Right
+                0.0f, 0.0f, 0.0f,  // Bottom-Right
+                0.0f, 0.0f, 0.0f,  // Bottom-Left
+
+                // ---------------------------------------------------------
+                // 2. UPPER RED BEAM (Shimaki)
+                // ---------------------------------------------------------
+                0.3f, 0.0f, 0.0f,  // Top-Left
+                0.3f, 0.0f, 0.0f,  // Top-Right
+                0.8f, 0.1f, 0.1f,  // Bottom-Right
+                0.8f, 0.1f, 0.1f,  // Bottom-Left
+};
 
 // ----------------------------------------------------------------
 // BACKGROUND GRADIENT DATA
@@ -405,7 +426,6 @@ GLfloat snowFieldHeight = -0.60f; // This value will be used for the transition.
 GLfloat seaLevel = -0.35f; // Adjust this value to raise/lower the sea line
 GLfloat darkSkyLevel = 0.6f; // The top Y-coordinate is 1.0f, the dark sky extend down to 0.6f.
 
-
 void displayToriGate() {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
@@ -423,8 +443,8 @@ void displayToriGate() {
         0.1f, 0.3f, 0.7f,
         0.1f, 0.3f, 0.7f,
         // BOTTOM: Lightest Blue (Horizon)
-        0.6f, 0.7f, 0.95f, 
-        0.6f, 0.7f, 0.95f   
+        0.6f, 0.7f, 0.95f,
+        0.6f, 0.7f, 0.95f
     };
     glVertexPointer(3, GL_FLOAT, 0, skyVertices);
     glColorPointer(3, GL_FLOAT, 0, skyColors);
@@ -450,24 +470,24 @@ void displayToriGate() {
     glDrawArrays(GL_QUADS, 0, 4);
 
     // --- 3. Draw the Snowy Field (Snow Horizon to Bottom) ---
-   GLfloat snowColor[] = {1.0f, 1.0f, 1.0f};
+    GLfloat snowColor[] = { 1.0f, 1.0f, 1.0f };
     glColor3fv(snowColor); // Set the global color state for white snow
 
     // Number of segments for the bumps
-    int numSegments = 20; 
+    int numSegments = 20;
     GLfloat segmentWidth = 2.0f / numSegments;
     GLfloat snowBottom = -1.0f;
-    
+
     glBegin(GL_QUAD_STRIP);
     for (int i = 0; i <= numSegments; ++i) {
         GLfloat x = -1.0f + (i * segmentWidth);
-        
+
         // Use a sine function to create the wavy, bumpy surface
-        GLfloat yBumpy = snowFieldHeight + 0.05f * sinf(x * 5.0f); 
-        
+        GLfloat yBumpy = snowFieldHeight + 0.05f * sinf(x * 5.0f);
+
         // Vertex 1: Top, Bumpy Edge
         glVertex3f(x, yBumpy, 0.0f);
-        
+
         // Vertex 2: Bottom, Flat Edge
         glVertex3f(x, snowBottom, 0.0f);
     }
@@ -508,74 +528,86 @@ GLfloat godzillaVertices[] = {
    0.52f,  0.53f,  0.0f,  // Bottom-Right
    0.47f,  0.53f,  0.0f,  // Bottom-Left
 
-    // ---------------------------------------------------------
-   // 4. BACK TRIANGLE - Dark Grey/Purple
    // ---------------------------------------------------------
-    0.65f,  0.4f,  0.0f,  // Top-Left
-    0.65f,  -0.5f,  0.0f,  // Top-Right
-    1.0f,  -0.5f,  0.0f,  // Bottom-Right
+  // 4. BACK TRIANGLE - Dark Grey/Purple
+  // ---------------------------------------------------------
+   0.65f,  0.4f,  0.0f,  // Top-Left
+   0.65f,  -0.5f,  0.0f,  // Top-Right
+   1.0f,  -0.5f,  0.0f,  // Bottom-Right
+
+   // ---------------------------------------------------------
+   // 5. LEG - Dark Grey/Purple (pentagon)
+   // ---------------------------------------------------------
+    0.65f,  -0.1f,  0.0f,  // peak
+    0.8f,  -0.2f,  0.0f,  // Top-Right
+    0.75f,  -0.55f,  0.0f,  // Bottom-Right
+    0.5f,  -0.55f,  0.0f,  // Bottom-Left
+    0.5f,  -0.3f,  0.0f,  // Top-left
 
     // ---------------------------------------------------------
-    // 5. LEG - Dark Grey/Purple (pentagon)
-    // ---------------------------------------------------------
-     0.65f,  -0.1f,  0.0f,  // peak
-     0.8f,  -0.2f,  0.0f,  // Top-Right
-     0.75f,  -0.55f,  0.0f,  // Bottom-Right
-     0.5f,  -0.55f,  0.0f,  // Bottom-Left
-     0.5f,  -0.3f,  0.0f,  // Top-left
+   // 5. ARM - Dark Grey/Purple (pentagon)
+   // ---------------------------------------------------------
+    0.5f,  0.25f,  0.0f,  // 1 ledt top
+    0.6f,  0.25f,  0.0f,  // 1 right top
+    0.6f,  0.1f,  0.0f,  // 1 right bottom
+    0.4f,  0.1f,  0.0f,  // 1 left bottom
+    0.45f,  0.2f,  0.0f,  // 1 left middle
+    0.5f,  0.2f,  0.0f,  // 1 right middle
 
-     // ---------------------------------------------------------
-    // 5. ARM - Dark Grey/Purple (pentagon)
-    // ---------------------------------------------------------
-     0.5f,  0.25f,  0.0f,  // 1 ledt top
-     0.6f,  0.25f,  0.0f,  // 1 right top
-     0.6f,  0.1f,  0.0f,  // 1 right bottom
-     0.4f,  0.1f,  0.0f,  // 1 left bottom
-     0.45f,  0.2f,  0.0f,  // 1 left middle
-     0.5f,  0.2f,  0.0f,  // 1 right middle
-
-     // ---------------------------------------------------------
-    // 6. BACK SPIKES (Triangle Fan)
-    // ---------------------------------------------------------
-
-    // Center of fan (root at spine)
-    0.70f, 0.15f, 0.0f,     // Fan center
-
-    // Outer spike points (ordered CCW)
-    0.82f, 0.28f, 0.0f,     // Spike tip 1 (upper)
-    0.90f, 0.15f, 0.0f,     // Spike tip 2 (middle)
-    0.82f, 0.00f, 0.0f,     // Spike tip 3 (lower)
-    0.75f, 0.05f, 0.0f,     // Spike tip 4 (base return)
-   
 };
 
 GLfloat godzillaColors[] = {
-    // 1. BODY (Dark Grey/Purple)
-    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.75f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,
+    // ---------------------------------------------------------
+    // 1. MAIN BODY (Torso) - Dark Grey/Purple
+    // ---------------------------------------------------------
+    0.25f, 0.2f, 0.25f,   // Top-Left
+    0.25f, 0.2f, 0.75f,   // Top-Right (Lighter/Blue tint)
+    0.25f, 0.2f, 0.25f,   // Bottom-Right
+    0.25f, 0.2f, 0.25f,   // Bottom-Left
 
-    // 2. HEAD (Dark Grey/Purple)
-    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.75f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,
+    // ---------------------------------------------------------
+    // 2. HEAD - Dark Grey/Purple
+    // ---------------------------------------------------------
+    0.25f, 0.2f, 0.25f,   // Top-Left
+    0.25f, 0.2f, 0.75f,   // Top-Right (Lighter/Blue tint)
+    0.25f, 0.2f, 0.25f,   // Bottom-Right
+    0.25f, 0.2f, 0.25f,   // Bottom-Left
 
-    // 3. EYE
+    // ---------------------------------------------------------
+    // 3. EYE - White
+    // ---------------------------------------------------------
+    1.0f, 1.0f, 1.0f,     // Top-Left
+    1.0f, 1.0f, 1.0f,     // Top-Right
+    1.0f, 1.0f, 1.0f,     // Bottom-Right
+    1.0f, 1.0f, 1.0f,     // Bottom-Left
 
-    1.0f, 1.0f, 1.0f,   1.0f,1.0f,1.0f, 1.0f,1.0f,1.0f, 1.0f,1.0f,1.0f,
-    // 4. BACK
+    // ---------------------------------------------------------
+    // 4. BACK TRIANGLE - Dark Grey/Purple
+    // ---------------------------------------------------------
+    0.25f, 0.2f, 0.65f,   // Top-Left (Lighter/Blue tint)
+    0.25f, 0.2f, 0.25f,   // Top-Right
+    0.25f, 0.2f, 0.75f,   // Bottom-Right (Lighter/Blue tint)
 
-    0.25f, 0.2f, 0.65f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.75f,
+    // ---------------------------------------------------------
+    // 5. LEG (Pentagon) - Dark Grey/Purple
+    // ---------------------------------------------------------
+    0.25f, 0.2f, 0.65f,   // Vertex 1 (Peak)
+    0.25f, 0.2f, 0.55f,   // Vertex 2 (Top-Right)
+    0.25f, 0.2f, 0.45f,   // Vertex 3 (Bottom-Right)
+    0.25f, 0.2f, 0.25f,   // Vertex 4 (Bottom-Left)
+    0.25f, 0.2f, 0.25f,   // Vertex 5 (Top-Left)
 
-    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f, 0.25f, 0.2f, 0.25f,
-
-    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f, 0.25f, 0.2f, 0.25f, 0.25f, 0.2f, 0.25f,
-
-    // 6. BACK SPIKES (light grey)
-    0.75f, 0.75f, 0.85f,
-    0.85f, 0.85f, 0.95f,
-    0.80f, 0.80f, 0.90f,
-    0.85f, 0.85f, 0.95f,
-    0.75f, 0.75f, 0.85f,
-
-
+    // ---------------------------------------------------------
+    // 6. ARM (Hexagon/Polygon) - Dark Grey/Purple
+    // ---------------------------------------------------------
+    0.25f, 0.2f, 0.35f,   // Vertex 1
+    0.25f, 0.2f, 0.75f,   // Vertex 2
+    0.25f, 0.2f, 0.35f,   // Vertex 3
+    0.25f, 0.2f, 0.25f,   // Vertex 4
+    0.25f, 0.2f, 0.25f,   // Vertex 5
+    0.0f, 0.0f, 0.0f,    // Vertex 6
 };
+
 void displayGodzilla() {
     // -------------------------------------------------
     // 1. DRAW BODY (Existing Vertex Arrays)
@@ -646,8 +678,6 @@ void displayGodzilla() {
     }
 }
 
-
-
 GLfloat boyVertices[] = {
     // ---------------------------------------------------------
     // 1. HEAD (Square)
@@ -678,7 +708,7 @@ GLfloat boyVertices[] = {
      0.065f, -0.08f, 0.0f,  // Right Arm Bottom-Right
      0.03f, -0.08f, 0.0f,   // Right Arm Bottom-Left
      // ---------------------------------------------------------
-     
+
      //5. Left leg
      -0.03f,  -0.12f, 0.0f,  // Left Leg Top-Left
      -0.0f,   -0.12f, 0.0f,  // Left Leg Top-Right
@@ -752,7 +782,6 @@ void initVBOs() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-
 // ----------------------------------------------------------------
 // DRAW THE BOY USING VBOs, CENTERED INSIDE THE TORI GATE
 // ----------------------------------------------------------------
@@ -773,7 +802,7 @@ void displayBoy() {
     glBindBuffer(GL_ARRAY_BUFFER, boyVBO[1]);
     glColorPointer(3, GL_FLOAT, 0, 0);
 
-    glDrawArrays(GL_QUADS, 0, 32); 
+    glDrawArrays(GL_QUADS, 0, 32);
 
     // Clean up
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -793,7 +822,7 @@ void displayBirds() {
     glBegin(GL_TRIANGLES);
     // We will draw the more bird-like 'W' shape using two triangles per bird
 
-    for (int i = 0; i < NUM_BIRDS; ++i){
+    for (int i = 0; i < NUM_BIRDS; ++i) {
         // i * 2 gives the index for the X offset
         GLfloat xOffset = birdOffsets[i * 2];
         // i * 2 + 1 gives the index for the Y offset
@@ -814,4 +843,60 @@ void displayBirds() {
         glVertex3f(birdX + BIRD_SCALE * 0.5f, birdY + BIRD_SCALE * 0.5f, 0.0f); // Inner point of right wing
     }
     glEnd();
+}
+
+// ----------------------------------------------------------------
+// GODZILLA ATOMIC BREATH (Jagged Beam)
+// ----------------------------------------------------------------
+GLfloat fireVertices[] = {
+    // 1. START POINT (The Mouth)
+    0.4f,   0.4f,   0.0f,   // Center/Base of the beam (at the mouth)
+
+    // 2. MOUTH FLARING (Top Anchor)
+    0.4f,   0.5f,   0.0f,   // Top corner of the mouth anchor
+
+    // 3. THE JAGGED BEAM (Going Leftwards)
+    -0.50f, 0.75f,  0.0f,   // Far Left - Top flare tip
+    -0.35f, 0.55f,  0.0f,   // Mid Left - Upper jagged inward point
+    -0.70f, 0.40f,  0.0f,   // Furthest Left - Center tip of the beam
+    -0.35f, 0.35f,  0.0f,   // Mid Left - Lower jagged inward point
+
+    // 4. BOTTOM FLARE
+    -0.50f, 0.20f,  0.0f,   // Far Left - Bottom flare tip
+};
+
+GLfloat fireColors[] = {
+    // 1. START POINT (White-Hot Core)
+    0.9f, 1.0f, 1.0f,       // Very bright Cyan/White
+
+    // 2. MOUTH FLARING (Deep Blue)
+    0.1f, 0.2f, 0.9f,       // Darker Blue anchor
+
+    // 3. THE JAGGED BEAM COLORS (Alternating Bright/Dark)
+    0.2f, 0.8f, 1.0f,       // Top Flare: Bright Neon Cyan
+    0.1f, 0.2f, 0.9f,       // Upper Jag: Deep Blue
+    0.1f, 0.2f, 0.9f,       // Center Tip: Deep Blue
+    0.2f, 0.8f, 1.0f,       // Lower Jag: Bright Neon Cyan
+
+    // 4. BOTTOM FLARE (Deep Blue)
+    0.1f, 0.2f, 0.9f,       // Bottom Flare: Deep Blue
+};
+
+void displayFire() {
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    glVertexPointer(3, GL_FLOAT, 0, fireVertices);
+    glColorPointer(3, GL_FLOAT, 0, fireColors);
+
+    // Optional: Enable blending for a "glowing" effect
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glDrawArrays(GL_POLYGON, 0, 7);
+
+    glDisable(GL_BLEND);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
 }
