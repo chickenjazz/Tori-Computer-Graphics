@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+﻿#include <GL/glew.h>
 #include <GL/glut.h>
 #include <iostream>
 
@@ -193,13 +193,126 @@ GLfloat colors[] = {
 
 };
 
+// ----------------------------------------------------------------
+// BACKGROUND GRADIENT DATA
+// ----------------------------------------------------------------
+GLfloat backgroundVertices[] = {
+    // Top-Left
+    -1.0f,  1.0f, 0.0f,
+    // Top-Right
+     1.0f,  1.0f, 0.0f,
+     // Bottom-Right
+      1.0f, -1.0f, 0.0f,
+      // Bottom-Left
+      -1.0f, -1.0f, 0.0f
+};
+
+GLfloat backgroundColors[] = {
+    // Top-Left (Sky Blue)
+    0.4f, 0.6f, 1.0f,
+    // Top-Right (Sky Blue)
+    0.4f, 0.6f, 1.0f,
+    // Bottom-Right (Snow White)
+    1.0f, 1.0f, 1.0f,
+    // Bottom-Left (Snow White)
+    1.0f, 1.0f, 1.0f
+};
+GLfloat snowFieldHeight = -0.60f; // This value will be used for the transition.
+GLfloat seaLevel = -0.35f; // Adjust this value to raise/lower the sea line
+GLfloat darkSkyLevel = 0.6f; // The top Y-coordinate is 1.0f. Let's make the dark sky extend down to 0.6f.
+
+
 void displayToriGate() {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
+    // 1.Draw the TOP Sky Gradient (Darker Blue)
+    GLfloat topSkyVertices[] = {
+        -1.0f,  1.0f, 0.0f,      // Top-Left (Full top of screen)
+         1.0f,  1.0f, 0.0f,      // Top-Right
+         1.0f,  darkSkyLevel, 0.0f,  // Bottom boundary for dark sky
+        -1.0f,  darkSkyLevel, 0.0f   // Bottom boundary for dark sky
+    };
+    GLfloat topSkyColors[] = {
+        0.1f, 0.3f, 0.7f, // Top-Left (Dark Sky Blue)
+        0.1f, 0.3f, 0.7f, // Top-Right (Dark Sky Blue)
+        0.4f, 0.6f, 1.0f, // Bottom Transition (Original Sky Color)
+        0.4f, 0.6f, 1.0f  // Bottom Transition (Original Sky Color)
+    };
+    glVertexPointer(3, GL_FLOAT, 0, topSkyVertices);
+    glColorPointer(3, GL_FLOAT, 0, topSkyColors);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    // 2. Draw the LOWER Sky Gradient
+    // This quad starts where the dark sky ends and goes down to the sea.
+    GLfloat lowerSkyVertices[] = {
+        -1.0f,  darkSkyLevel, 0.0f,  // Top-Left (Matches darkSkyLevel)
+         1.0f,  darkSkyLevel, 0.0f,  // Top-Right
+         1.0f,  seaLevel, 0.0f,      // Sea Horizon Right
+        -1.0f,  seaLevel, 0.0f       // Sea Horizon Left
+    };
+    GLfloat lowerSkyColors[] = {
+        0.4f, 0.6f, 1.0f, // Top-Left (Original Sky Color - matches bottom of dark sky)
+        0.4f, 0.6f, 1.0f, // Top-Right (Original Sky Color)
+        0.3f, 0.5f, 0.9f, // Sea Horizon Right (Slightly darker blue, transitioning to sea)
+        0.3f, 0.5f, 0.9f  // Sea Horizon Left
+    };
+    glVertexPointer(3, GL_FLOAT, 0, lowerSkyVertices);
+    glColorPointer(3, GL_FLOAT, 0, lowerSkyColors);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    GLfloat skyVertices[] = {
+        -1.0f,  1.0f, 0.0f,  // Top-Left
+         1.0f,  1.0f, 0.0f,  // Top-Right
+         1.0f,  snowFieldHeight, 0.0f, // Horizon Right
+        -1.0f,  snowFieldHeight, 0.0f  // Horizon Left
+    };
+    GLfloat skyColors[] = {
+        0.4f, 0.6f, 1.0f, // Top-Left (Sky Blue)
+        0.4f, 0.6f, 1.0f, // Top-Right (Sky Blue)
+        0.6f, 0.8f, 1.0f, // Horizon Right (Lighter Blue for a softer transition)
+        0.6f, 0.8f, 1.0f  // Horizon Left (Lighter Blue)
+    };
+
+    glVertexPointer(3, GL_FLOAT, 0, skyVertices);
+    glColorPointer(3, GL_FLOAT, 0, skyColors);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    // 3. Draw the Sea Gradient (Darker Blue to Lighter Blue/Green)
+    GLfloat seaVertices[] = {
+        -1.0f,  seaLevel, 0.0f,         // Top-Left (Matches sky bottom)
+         1.0f,  seaLevel, 0.0f,         // Top-Right (Matches sky bottom)
+         1.0f,  snowFieldHeight, 0.0f,  // Snow Horizon Right
+        -1.0f,  snowFieldHeight, 0.0f    // Snow Horizon Left
+    };
+    GLfloat seaColors[] = {
+        0.1f, 0.3f, 0.7f, // Top-Left (Deep Sea Blue)
+        0.1f, 0.3f, 0.7f, // Top-Right (Deep Sea Blue)
+        0.2f, 0.5f, 0.8f, // Snow Horizon Right (Lighter, maybe slightly greenish for shallow water)
+        0.2f, 0.5f, 0.8f  // Snow Horizon Left (Lighter, maybe slightly greenish for shallow water)
+    };
+    glVertexPointer(3, GL_FLOAT, 0, seaVertices);
+    glColorPointer(3, GL_FLOAT, 0, seaColors);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    GLfloat snowVertices[] = {
+        -1.0f,  snowFieldHeight, 0.0f, // Top-Left (Horizon Left)
+         1.0f,  snowFieldHeight, 0.0f, // Top-Right (Horizon Right)
+         1.0f, -1.0f, 0.0f,  // Bottom-Right
+        -1.0f, -1.0f, 0.0f   // Bottom-Left
+    };
+    GLfloat snowColors[] = {
+        1.0f, 1.0f, 1.0f, // Top-Left (White)
+        1.0f, 1.0f, 1.0f, // Top-Right (White)
+        1.0f, 1.0f, 1.0f, // Bottom-Right (White)
+        1.0f, 1.0f, 1.0f  // Bottom-Left (White)
+    };
+    glVertexPointer(3, GL_FLOAT, 0, snowVertices);
+    glColorPointer(3, GL_FLOAT, 0, snowColors);
+    glDrawArrays(GL_QUADS, 0, 4);
+
     glVertexPointer(3, GL_FLOAT, 0, toriGateVertices);
     glColorPointer(3, GL_FLOAT, 0, colors);
-
     // Draw 32 vertices (8 parts * 4 vertices per quad)
     glDrawArrays(GL_QUADS, 0, 48);
 
@@ -411,3 +524,5 @@ void displayBoy() {
 
     glPopMatrix();
 }
+
+
