@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
         birdOffsets[i * 2 + 1] = ((float)rand() / RAND_MAX * flockSpreadY) - (flockSpreadY / 2.0f);
     }
 
-    glutTimerFunc(1000, animateGodzilla, 0);
+    glutTimerFunc(10000, animateGodzilla, 0);
     glutMouseFunc(mouseCallback);
     glutDisplayFunc(Display);
     glutMainLoop();
