@@ -6,6 +6,7 @@
 using namespace std;
 
 // PROTOTYPES
+
 void displayToriGate();
 void displayGodzilla();
 void displayBoy();
@@ -27,9 +28,8 @@ void Display() {
 
     // Reset transformations
     glLoadIdentity();
-
     displayToriGate();
-    //displayGodzilla();
+    displayGodzilla();
     displayBoy();
     displayBirds();
     glutSwapBuffers();
@@ -325,69 +325,164 @@ GLfloat godzillaVertices[] = {
     // ---------------------------------------------------------
     // 1. MAIN BODY (Torso) - Dark Grey/Purple
     // ---------------------------------------------------------
-     0.45f,  0.6f,  0.0f,  // Top-Left
-     0.7f,  0.6f,  0.0f,  // Top-Right
-     0.7f,  0.0f,  0.0f,  // Bottom-Right
-     0.45f,  0.0f,  0.0f,  // Bottom-Left
+     0.45f,  0.62f,  0.0f,  // Top-Left
+     0.65f,  0.55f,  0.0f,  // Top-Right
+     0.7f,  -0.5f,  0.0f,  // Bottom-Right
+     0.45f,  -0.5f,  0.0f,  // Bottom-Left
+
 
      // ---------------------------------------------------------
    // 2. HEAD - Dark Grey/Purple
    // ---------------------------------------------------------
     0.4f,  0.63f,  0.0f,  // Top-Left
-    0.6f,  0.63f,  0.0f,  // Top-Right
+    0.6f,  0.6f,  0.0f,  // Top-Right
     0.6f,  0.4f,  0.0f,  // Bottom-Right
     0.4f,  0.4f,  0.0f,  // Bottom-Left
 
     // ---------------------------------------------------------
-   // 3. BACK (Torso) - Dark Grey/Purple
-   // ---------------------------------------------------------
-    0.6f,  0.55f,  0.0f,  // Top-Left
-    0.7f,  0.0f,  0.0f,  // Top-Right
-    0.85f,  0.0f,  0.0f,  // Bottom-Right
+  // 3. EYE - WHITE
+  // ---------------------------------------------------------
+   0.47f,  0.55f,  0.0f,  // Top-Left
+   0.52f,  0.59f,  0.0f,  // Top-Right
+   0.52f,  0.53f,  0.0f,  // Bottom-Right
+   0.47f,  0.53f,  0.0f,  // Bottom-Left
 
     // ---------------------------------------------------------
-  // 4. TAIL - Dark Grey/Purple
-  // ---------------------------------------------------------
-   0.78f,  0.34f,  0.0f,   // Tip of tail (top)
-   0.9f,   0.26f, 0.0f,   // Upper right
-   0.94f,  0.0f,  0.0f,   // 
-   0.84f,  0.0f,  0.0f,   // 
-   0.8f,   0.1f,  0.0f    //
+   // 4. BACK TRIANGLE - Dark Grey/Purple
+   // ---------------------------------------------------------
+    0.65f,  0.4f,  0.0f,  // Top-Left
+    0.65f,  -0.5f,  0.0f,  // Top-Right
+    1.0f,  -0.5f,  0.0f,  // Bottom-Right
 
+    // ---------------------------------------------------------
+    // 5. LEG - Dark Grey/Purple (pentagon)
+    // ---------------------------------------------------------
+     0.65f,  -0.1f,  0.0f,  // peak
+     0.8f,  -0.2f,  0.0f,  // Top-Right
+     0.75f,  -0.55f,  0.0f,  // Bottom-Right
+     0.5f,  -0.55f,  0.0f,  // Bottom-Left
+     0.5f,  -0.3f,  0.0f,  // Top-left
 
+     // ---------------------------------------------------------
+    // 5. ARM - Dark Grey/Purple (pentagon)
+    // ---------------------------------------------------------
+     0.5f,  0.25f,  0.0f,  // 1 ledt top
+     0.6f,  0.25f,  0.0f,  // 1 right top
+     0.6f,  0.1f,  0.0f,  // 1 right bottom
+     0.4f,  0.1f,  0.0f,  // 1 left bottom
+     0.45f,  0.2f,  0.0f,  // 1 left middle
+     0.5f,  0.2f,  0.0f,  // 1 right middle
 
+     // ---------------------------------------------------------
+    // 6. BACK SPIKES (Triangle Fan)
+    // ---------------------------------------------------------
+
+    // Center of fan (root at spine)
+    0.70f, 0.15f, 0.0f,     // Fan center
+
+    // Outer spike points (ordered CCW)
+    0.82f, 0.28f, 0.0f,     // Spike tip 1 (upper)
+    0.90f, 0.15f, 0.0f,     // Spike tip 2 (middle)
+    0.82f, 0.00f, 0.0f,     // Spike tip 3 (lower)
+    0.75f, 0.05f, 0.0f,     // Spike tip 4 (base return)
+   
 };
 
 GLfloat godzillaColors[] = {
     // 1. BODY (Dark Grey/Purple)
-    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,
+    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.75f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,
 
     // 2. HEAD (Dark Grey/Purple)
-    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,
+    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.75f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,
 
-    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,
+    // 3. EYE
 
-    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f, 0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,
+    1.0f, 1.0f, 1.0f,   1.0f,1.0f,1.0f, 1.0f,1.0f,1.0f, 1.0f,1.0f,1.0f,
+    // 4. BACK
+
+    0.25f, 0.2f, 0.65f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.75f,
+
+    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f, 0.25f, 0.2f, 0.25f,
+
+    0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f,   0.25f, 0.2f, 0.25f, 0.25f, 0.2f, 0.25f, 0.25f, 0.2f, 0.25f,
+
+    // 6. BACK SPIKES (light grey)
+    0.75f, 0.75f, 0.85f,
+    0.85f, 0.85f, 0.95f,
+    0.80f, 0.80f, 0.90f,
+    0.85f, 0.85f, 0.95f,
+    0.75f, 0.75f, 0.85f,
+
 
 };
-
 void displayGodzilla() {
+    // -------------------------------------------------
+    // 1. DRAW BODY (Existing Vertex Arrays)
+    // -------------------------------------------------
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
     glVertexPointer(3, GL_FLOAT, 0, godzillaVertices);
     glColorPointer(3, GL_FLOAT, 0, godzillaColors);
 
-    // Draw 36 vertices (9 parts * 4 vertices per quad)
-    glDrawArrays(GL_QUADS, 0, 8);
-    glDrawArrays(GL_TRIANGLES, 8, 3); //for the back
+    glDrawArrays(GL_QUADS, 0, 12);
+    glDrawArrays(GL_TRIANGLES, 12, 3);
+    glDrawArrays(GL_POLYGON, 15, 5);
+    glDrawArrays(GL_POLYGON, 20, 6);
 
-    glDrawArrays(GL_TRIANGLES, 11, 3); //tail
-    glDrawArrays(GL_TRIANGLES, 12, 3); //tail
-
-
+    // -------------------------------------------------
+    // 2. DRAW SPIKES (Procedural Loop)
+    // -------------------------------------------------
+    // Turn off arrays to use manual glBegin/glEnd
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
+
+    float startX = 0.65f, startY = 0.4f;  // Neck
+    float endX = 1.0f, endY = -0.5f; // Tail
+
+    // CHANGE 1: Increased spikes to 6 to add density at the neck
+    int numSpikes = 6;
+
+    // CHANGE 2: Define Neon Blue-Green Colors
+    GLfloat neonTipColor[] = { 0.7f, 0.85f, 1.0f };
+    // Deep, saturated blue for the base flame
+    GLfloat neonBaseColor[] = { 0.1f, 0.2f, 0.9f };
+
+    for (int i = 0; i < numSpikes; i++) {
+        // t goes from 0.0 (neck) to near 1.0 (tail)
+        float t = (float)i / (float)numSpikes;
+        // Offset for the second base point of the spike
+        float t_next = (float)(i + 0.75) / (float)numSpikes;
+
+        // Interpolate positions along the back
+        float baseX = startX + (endX - startX) * t;
+        float baseY = startY + (endY - startY) * t;
+
+        float nextBaseX = startX + (endX - startX) * t_next;
+        float nextBaseY = startY + (endY - startY) * t_next;
+
+        // Size calculation (slightly larger base size for neon look)
+        float size = 0.32f * (1.0f - (t * 0.3f));
+
+        // Calculate tip position (peaking right)
+        float tipX = (baseX + nextBaseX) / 2.0f + 0.08f;
+        float tipY = (baseY + nextBaseY) / 2.0f + size;
+
+        glBegin(GL_TRIANGLE_FAN);
+        // CHANGE 3: Apply Neon Colors
+        // 1. The Tip (Center of Fan)
+        glColor3fv(neonTipColor);
+        glVertex3f(tipX, tipY, 0.0f);
+
+        // 2. Base Front
+        glColor3fv(neonBaseColor);
+        glVertex3f(baseX, baseY, 0.0f);
+
+        // 3. Base Back
+        glColor3fv(neonBaseColor);
+        glVertex3f(nextBaseX, nextBaseY, 0.0f);
+        glEnd();
+    }
 }
 
 
@@ -434,6 +529,7 @@ GLfloat boyVertices[] = {
       0.03f, -0.12f, 0.0f,   // Right Leg Top-Right
       0.03f, -0.25f, 0.0f,   // Right Leg Bottom-Right
       0.0f,  -0.25f, 0.0f,   // Right Leg Bottom-Left
+
 };
 
 GLfloat boyColors[] = {
