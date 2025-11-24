@@ -40,6 +40,10 @@ float targetMode = 0;
 bool isFiring = false;
 bool isSnowing = false;
 
+float snowAlpha = 0.0f;         // Current opacity (0.0 to TARGET)
+const float SNOW_MAX_ALPHA = 1.0f; // Max opacity for snow
+const float SNOW_FADE_SPEED = 0.01f; // How fast it fades
+
 // --- ANIMATION VARIABLES ---
 float godzillaX = 1.0f;
 float godzillaY = 0.0f;
@@ -204,7 +208,24 @@ void animateBackground(int value) {
 }
 
 void animateSnowfall(int value) {
+    // 1. HANDLE FADING
     if (isSnowing) {
+        // Fade In
+        if (snowAlpha < SNOW_MAX_ALPHA) {
+            snowAlpha += SNOW_FADE_SPEED;
+            if (snowAlpha > SNOW_MAX_ALPHA) snowAlpha = SNOW_MAX_ALPHA;
+        }
+    }
+    else {
+        // Fade Out
+        if (snowAlpha > 0.0f) {
+            snowAlpha -= SNOW_FADE_SPEED;
+            if (snowAlpha < 0.0f) snowAlpha = 0.0f;
+        }
+    }
+
+    // 2. UPDATE POSITIONS (Keep falling if visible at all)
+    if (snowAlpha > 0.0f) {
         for (int i = 0; i < totalSnowBalls; i++) {
             snowYs[i] -= 0.02f;
 
@@ -219,17 +240,22 @@ void animateSnowfall(int value) {
     glutTimerFunc(16, animateSnowfall, 0);
 }
 void drawSnowBalls() {
-    if (!isSnowing) return; 
+    if (snowAlpha <= 0.0f) return;
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glPointSize(5.0f);
     glBegin(GL_POINTS);
 
     for (int i = 0; i < totalSnowBalls; i++) {
-        setSnowColor(1.0f, 1.0f, 1.0f, 0.25f);
+        // Use snowAlpha for the alpha channel
+        setSnowColor(1.0f, 1.0f, 1.0f, snowAlpha);
         glVertex2f(snowXs[i], snowYs[i]);
     }
 
     glEnd();
+    glDisable(GL_BLEND);
 }
  //---------------------------------------------------------------
 // INITIALIZE SNOWBALLS
