@@ -341,7 +341,7 @@ int main(int argc, char** argv) {
         birdOffsets[i * 2 + 1] = ((float)rand() / RAND_MAX * flockSpreadY) - (flockSpreadY / 2.0f);
     }
 
-    glutTimerFunc(1000, animateGodzilla, 0);
+    glutTimerFunc(10000, animateGodzilla, 0);
     glutMouseFunc(mouseCallback);
     glutDisplayFunc(Display);
     glutMainLoop();
@@ -823,42 +823,42 @@ void snowpile() {
 // ----------------------------------------------------------------
 GLfloat godzillaVertices[] = {
     // 1. MAIN BODY
-     0.45f,  0.62f,  0.0f,  // Top-Left
-     0.65f,  0.55f,  0.0f,  // Top-Right
-     0.7f,  -0.5f,  0.0f,  // Bottom-Right
-     0.45f,  -0.5f,  0.0f,  // Bottom-Left
+     0.45f,  0.67f,  0.0f,  // Top-Left
+     0.65f,  0.5f,  0.0f,  // Top-Right
+     0.7f,  -0.45f,  0.0f,  // Bottom-Right
+     0.45f,  -0.45f,  0.0f,  // Bottom-Left
 
      // 2. HEAD
-      0.4f,  0.63f,  0.0f,  // Top-Left
-      0.6f,  0.6f,  0.0f,  // Top-Right
-      0.6f,  0.4f,  0.0f,  // Bottom-Right
-      0.4f,  0.4f,  0.0f,  // Bottom-Left
+      0.4f,  0.68f,  0.0f,  // Top-Left
+      0.6f,  0.65f,  0.0f,  // Top-Right
+      0.6f,  0.45f,  0.0f,  // Bottom-Right
+      0.4f,  0.45f,  0.0f,  // Bottom-Left
 
       // 3. EYE
-       0.47f,  0.55f,  0.0f,  // Top-Left
-       0.52f,  0.59f,  0.0f,  // Top-Right
-       0.52f,  0.53f,  0.0f,  // Bottom-Right
-       0.47f,  0.53f,  0.0f,  // Bottom-Left
+       0.47f,  0.6f,  0.0f,  // Top-Left
+       0.52f,  0.64f,  0.0f,  // Top-Right
+       0.52f,  0.58f,  0.0f,  // Bottom-Right
+       0.47f,  0.58f,  0.0f,  // Bottom-Left
 
        // 4. BACK TRIANGLE
-        0.65f,  0.4f,  0.0f,  // Top-Left
-        0.65f,  -0.5f,  0.0f,  // Top-Right
-        1.0f,  -0.5f,  0.0f,  // Bottom-Right
+        0.65f,  0.45f,  0.0f,  // Top-Left
+        0.65f,  -0.45f,  0.0f,  // Top-Right
+        1.0f,  -0.45f,  0.0f,  // Bottom-Right
 
         // 5. LEG
-         0.65f,  -0.1f,  0.0f,  // peak
-         0.8f,  -0.2f,  0.0f,  // Top-Right
-         0.75f,  -0.55f,  0.0f,  // Bottom-Right
-         0.5f,  -0.55f,  0.0f,  // Bottom-Left
-         0.5f,  -0.3f,  0.0f,  // Top-left
+         0.65f,  -0.05f,  0.0f,  // peak
+         0.8f,  -0.15f,  0.0f,  // Top-Right
+         0.75f,  -0.5f,  0.0f,  // Bottom-Right
+         0.5f,  -0.5f,  0.0f,  // Bottom-Left
+         0.5f,  -0.25f,  0.0f,  // Top-left
 
          // 6. ARM
-          0.5f,  0.25f,  0.0f,  // 1 ledt top
-          0.6f,  0.25f,  0.0f,  // 1 right top
-          0.6f,  0.1f,  0.0f,  // 1 right bottom
-          0.4f,  0.1f,  0.0f,  // 1 left bottom
-          0.45f,  0.2f,  0.0f,  // 1 left middle
-          0.5f,  0.2f,  0.0f,  // 1 right middle
+          0.5f,  0.3f,  0.0f,  // 1 ledt top
+          0.6f,  0.3f,  0.0f,  // 1 right top
+          0.6f,  0.15f,  0.0f,  // 1 right bottom
+          0.4f,  0.15f,  0.0f,  // 1 left bottom
+          0.45f,  0.25f,  0.0f,  // 1 left middle
+          0.5f,  0.25f,  0.0f,  // 1 right middle
 };
 
 GLfloat godzillaColors[] = {
@@ -917,8 +917,8 @@ void displayGodzilla() {
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
 
-    float startX = 0.65f, startY = 0.4f;
-    float endX = 1.0f, endY = -0.5f;
+    float startX = 0.65f, startY = 0.45f;
+    float endX = 1.0f, endY = -0.45f;
     int numSpikes = 6;
 
     GLfloat neonTipColor[] = { 0.7f, 0.85f, 1.0f };
