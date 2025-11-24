@@ -90,26 +90,25 @@ void drawCloud(float cx, float cy, float size, float offset) {
 // TIMER FUNCTION (ANIMATION)
 // ----------------------------------------------------------------
 void animateGodzilla(int value) {
-    if (value == 0) {
-        glutTimerFunc(16, animateGodzilla, 1);
-    }
-    else if (value == 1) {
-        // --- 1. UPDATE CLOUDS (THIS WAS MISSING) ---
-        cloudOffset1 += 0.00005f; // Horizon moves slow
-        cloudOffset2 += 0.00008f; // Mid moves medium
-        cloudOffset3 += 0.00012f; // High moves fast
+    // --- CLOUDS SHOULD ALWAYS MOVE ---
+    cloudOffset1 += 0.00005f; //far = slower
+    cloudOffset2 += 0.00008f; // medium
+    cloudOffset3 += 0.0002f;  // fast
 
-        // --- 2. UPDATE GODZILLA ---
+    // --- GODZILLA STARTS MOVING ONLY AFTER 10 SECONDS ---
+    if (value == 1) {
         if (godzillaX > -2.5f) {
             godzillaX -= 0.002f;
             godzillaY = 0.007f * abs(sin(godzillaX * 20.0f));
             groundShake = 0.002f * abs(sin(godzillaX * 20.0f));
         }
-
-        // --- 3. ALWAYS LOOP ---
-        glutPostRedisplay();
-        glutTimerFunc(16, animateGodzilla, 1);
     }
+
+    // Always redraw
+    glutPostRedisplay();
+
+    // Loop timer
+    glutTimerFunc(16, animateGodzilla, value);
 }
 
 // ----------------------------------------------------------------
@@ -341,7 +340,8 @@ int main(int argc, char** argv) {
         birdOffsets[i * 2 + 1] = ((float)rand() / RAND_MAX * flockSpreadY) - (flockSpreadY / 2.0f);
     }
 
-    glutTimerFunc(10000, animateGodzilla, 0);
+    glutTimerFunc(16, animateGodzilla, 0);
+    glutTimerFunc(10000, animateGodzilla, 1);
     glutMouseFunc(mouseCallback);
     glutDisplayFunc(Display);
     glutMainLoop();
