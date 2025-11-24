@@ -21,7 +21,6 @@ void animateFlock(int value);
 void birdMovement(int key, int x, int y);
 void displayMountains();
 
-int backgroundMode = 1;  // 1 = Day, 2 = Dawn
 const int NUM_BIRDS = 15;
 const GLfloat BIRD_COLOR[] = { 0.0f, 0.0f, 0.0f };
 const GLfloat BIRD_SCALE = 0.020f;
@@ -31,6 +30,9 @@ GLfloat birdFlock_X = 50.0f; //Current X-position
 const GLfloat BIRD_FLOCK_SPEED = 0.005f; //Movement speed per frame
 int birdFlockDirection = 0; //Flag to control movement: -1 (Left), 1 (Right), 0 (Idle)
 
+float transition = 0.0f;
+bool isTransitioning = false;
+float targetMode = 0;
 bool isFiring = false;
 
 // --- ANIMATION VARIABLES ---
@@ -43,7 +45,7 @@ float cloudOffset1 = 0.0f; // Horizon (Slowest)
 float cloudOffset2 = 0.0f; // Mid (Medium)
 float cloudOffset3 = 0.0f; // High (Fastest)
 
-
+inline float mixf(float a, float b, float t);//for intepolation (transition)
 
 
 
@@ -68,14 +70,14 @@ void drawCloud(float cx, float cy, float size, float offset) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    if (backgroundMode == 1) {
-        // Bright daytime clouds
-        glColor4f(0.7f, 0.8f, 1.0f, 0.15f);
-    }
-    else {
-        // Darker purple dusk clouds
-        glColor4f(0.65f, 0.55f, 0.80f, 0.15f);
-    }
+    float dayR = 0.7f, dayG = 0.8f, dayB = 1.0f;
+    float dawnR = 0.65f, dawnG = 0.55f, dawnB = 0.80f;
+
+    float R = mixf(dayR, dawnR, transition);
+    float G = mixf(dayG, dawnG, transition);
+    float B = mixf(dayB, dawnB, transition);
+
+    glColor4f(R, G, B, 0.15f);
 
     // Draw 4 overlapping circles (Top, Sides, and a wide Bottom base)
     float offsets[6][3] = {
@@ -111,12 +113,13 @@ void drawCloud(float cx, float cy, float size, float offset) {
 
 void keyboardMonitor(unsigned char key, int x, int y) {
     if (key == '1') {
-        backgroundMode = 1;  // Day
+        targetMode = 0.0f; // Day
+        isTransitioning = true;
     }
     if (key == '2') {
-        backgroundMode = 2;  // Dawn
+        targetMode = 1.0f; // Dawn
+        isTransitioning = true;
     }
-    glutPostRedisplay();
 }
 
 // ----------------------------------------------------------------
@@ -144,6 +147,25 @@ void animateGodzilla(int value) {
     glutTimerFunc(16, animateGodzilla, value);
 }
 
+void animateBackground(int value) {
+    if (isTransitioning) {
+        float speed = 0.0045f; // adjust for slower/faster transition
+
+        if (transition < targetMode)
+            transition += speed;
+        else if (transition > targetMode)
+            transition -= speed;
+
+        if (fabs(transition - targetMode) < 0.004f) {
+            transition = targetMode;
+            isTransitioning = false;
+        }
+        glutPostRedisplay();
+    }
+
+    glutTimerFunc(16, animateBackground, 0);
+}
+
 // ----------------------------------------------------------------
 // MOUSE CALLBACK
 // ----------------------------------------------------------------
@@ -160,16 +182,17 @@ void mouseCallback(int button, int state, int x, int y) {
 //------------------------------------------------------------------
 
 void applySnowFieldColor(float r, float g, float b) {
-    if (backgroundMode == 1) {
-        glColor3f(r, g, b);
-    }
-    else {
-        // Darken for dawn mode
-        float dr = r * 0.45f;
-        float dg = g * 0.45f;
-        float db = b * 0.55f;   // keep slight blue/purple
-        glColor3f(dr, dg, db);
-    }
+    float dawnFactor = transition;
+
+    float dr = mixf(r, r * 0.45f, dawnFactor);
+    float dg = mixf(g, g * 0.45f, dawnFactor);
+    float db = mixf(b, b * 0.55f, dawnFactor);
+
+    glColor3f(dr, dg, db);
+}
+
+inline float mixf(float a, float b, float t) {
+    return a * (1.0f - t) + b * t;
 }
 
 
@@ -196,26 +219,22 @@ void displayBackground() {
 
     GLfloat skyColors[12];
 
-    if (backgroundMode == 1) {
-        // DAY
-        skyColors[0] = skyColors[3] = 0.1f;  // top R
-        skyColors[1] = skyColors[4] = 0.2f;  // top G
-        skyColors[2] = skyColors[5] = 0.5f;  // top B
+    // DAY TOP → DAWN TOP
+    float dayTopR = 0.1f, dayTopG = 0.2f, dayTopB = 0.5f;
+    float dawnTopR = 0.45f, dawnTopG = 0.05f, dawnTopB = 0.55f;
 
-        skyColors[6] = skyColors[9] = 0.6f;  // bottom R
-        skyColors[7] = skyColors[10] = 0.7f; // bottom G
-        skyColors[8] = skyColors[11] = 0.95f; // bottom B
-    }
-    else if (backgroundMode == 2) {
-        // DAWN (purple → orange)
-        skyColors[0] = skyColors[3] = 0.45f; // top R
-        skyColors[1] = skyColors[4] = 0.05f; // top G
-        skyColors[2] = skyColors[5] = 0.55f; // top B  (purple)
+    // DAY BOTTOM → DAWN BOTTOM
+    float dayBotR = 0.6f, dayBotG = 0.7f, dayBotB = 0.95f;
+    float dawnBotR = 1.0f, dawnBotG = 0.45f, dawnBotB = 0.1f;
 
-        skyColors[6] = skyColors[9] = 1.0f; // bottom R
-        skyColors[7] = skyColors[10] = 0.45f; // bottom G
-        skyColors[8] = skyColors[11] = 0.1f;  // bottom B (orange)
-    }
+    skyColors[0] = skyColors[3] = mixf(dayTopR, dawnTopR, transition);
+    skyColors[1] = skyColors[4] = mixf(dayTopG, dawnTopG, transition);
+    skyColors[2] = skyColors[5] = mixf(dayTopB, dawnTopB, transition);
+
+    skyColors[6] = skyColors[9] = mixf(dayBotR, dawnBotR, transition);
+    skyColors[7] = skyColors[10] = mixf(dayBotG, dawnBotG, transition);
+    skyColors[8] = skyColors[11] = mixf(dayBotB, dawnBotB, transition);
+
     glVertexPointer(3, GL_FLOAT, 0, skyVertices);
     glColorPointer(3, GL_FLOAT, 0, skyColors);
     glDrawArrays(GL_QUADS, 0, 4);
@@ -303,28 +322,22 @@ void displayBackground() {
     // UPDATED COLORS: The Top of the sea now matches the Bottom of the sky
     GLfloat seaColors[12];
 
-    if (backgroundMode == 1) {
-        // DAY
-        seaColors[0] = seaColors[3] = 0.5f;
-        seaColors[1] = seaColors[4] = 0.7f;
-        seaColors[2] = seaColors[5] = 0.95f;
+    // DAY TOP → DAWN TOP
+    float sDayTopR = 0.5f, sDayTopG = 0.7f, sDayTopB = 0.95f;
+    float sDawnTopR = 0.85f, sDawnTopG = 0.35f, sDawnTopB = 0.15f;
 
-        seaColors[6] = seaColors[9] = 0.1f;
-        seaColors[7] = seaColors[10] = 0.2f;
-        seaColors[8] = seaColors[11] = 0.5f;
-    }
-    else if (backgroundMode == 2) {
-        // DAWN (soft purple → warm orange reflection)
-   //  TOP color 
-        seaColors[0] = seaColors[3] = 0.85f;   // R
-        seaColors[1] = seaColors[4] = 0.35f;  // G
-        seaColors[2] = seaColors[5] = 0.15f;  // B (orange on top)
+    // DAY BOTTOM → DAWN BOTTOM
+    float sDayBotR = 0.1f, sDayBotG = 0.2f, sDayBotB = 0.5f;
+    float sDawnBotR = 0.55f, sDawnBotG = 0.2f, sDawnBotB = 0.65f;
 
-        //  BOTTOM color 
-        seaColors[6] = seaColors[9] = 0.55f; // R
-        seaColors[7] = seaColors[10] = 0.2f;  // G
-        seaColors[8] = seaColors[11] = 0.65f; // B (purple on bottom)
-    }
+    seaColors[0] = seaColors[3] = mixf(sDayTopR, sDawnTopR, transition);
+    seaColors[1] = seaColors[4] = mixf(sDayTopG, sDawnTopG, transition);
+    seaColors[2] = seaColors[5] = mixf(sDayTopB, sDawnTopB, transition);
+
+    seaColors[6] = seaColors[9] = mixf(sDayBotR, sDawnBotR, transition);
+    seaColors[7] = seaColors[10] = mixf(sDayBotG, sDawnBotG, transition);
+    seaColors[8] = seaColors[11] = mixf(sDayBotB, sDawnBotB, transition);
+
     glVertexPointer(3, GL_FLOAT, 0, seaVertices);
     glColorPointer(3, GL_FLOAT, 0, seaColors);
     glDrawArrays(GL_QUADS, 0, 4);
@@ -433,6 +446,7 @@ int main(int argc, char** argv) {
     }
     glutSpecialFunc(birdMovement);
     glutTimerFunc(0, animateFlock, TIMER_ID_FLIGHT);
+    glutTimerFunc(16, animateBackground, 0);
     glutTimerFunc(16, animateGodzilla, 0);
     glutTimerFunc(1000, animateGodzilla, 1);
     glutKeyboardFunc(keyboardMonitor);
@@ -753,17 +767,18 @@ void displayToriGate() {
 }
 
 void setSnowColor(float r, float g, float b, float a) {
-    if (backgroundMode == 1) {
-        glColor4f(r, g, b, a);  // Normal day color
-    }
-    else {
-        // Darken for dawn mode
-        float dr = r * 0.45f;
-        float dg = g * 0.45f;
-        float db = b * 0.55f;   // slightly bluish
+    float t = transition; // 0 = day, 1 = dawn
 
-        glColor4f(dr, dg, db, a);
-    }
+    // Dawn snow is darker & slightly bluish
+    float r2 = r * 0.45f;
+    float g2 = g * 0.45f;
+    float b2 = b * 0.55f;
+
+    float R = mixf(r, r2, t);
+    float G = mixf(g, g2, t);
+    float B = mixf(b, b2, t);
+
+    glColor4f(R, G, B, a);
 }
 
 //-----------------------------------------------------------------
