@@ -20,6 +20,9 @@ void animateGodzilla(int value);
 void animateFlock(int value);
 void birdMovement(int key, int x, int y);
 void displayMountains();
+void animateBoyRun(int value);
+void boyKeyboardFunc(unsigned char key, int x, int y);
+
 
 const int NUM_BIRDS = 15;
 const GLfloat BIRD_COLOR[] = { 0.0f, 0.0f, 0.0f };
@@ -36,6 +39,13 @@ bool isFiring = false;
 float godzillaX = 1.0f;
 float godzillaY = 0.0f;
 float groundShake = 0.0f;
+
+//boy animations
+bool isBoyRunning = false;
+float boyScale = 1.0f; // Scale factor for the boy
+float boyPosX = 0.0f;// X-translation for boy's position
+float boyPosY = -0.40f;// Y-translation for boy's position
+float legRotateAngle = 0.0f;// For cartoon run animation
 
 // Cloud Animation Variables (Different speeds for parallax effect)
 float cloudOffset1 = 0.0f; // Horizon (Slowest)
@@ -355,6 +365,8 @@ int main(int argc, char** argv) {
     glutTimerFunc(0, animateFlock, TIMER_ID_FLIGHT);
     glutTimerFunc(16, animateGodzilla, 0);
     glutTimerFunc(10000, animateGodzilla, 1);
+    glutTimerFunc(16, animateBoyRun, 0);
+    glutKeyboardFunc(boyKeyboardFunc);
     glutMouseFunc(mouseCallback);
     glutDisplayFunc(Display);
     glutMainLoop();
@@ -1142,19 +1154,62 @@ void initVBOs() {
 }
 
 void displayBoy() {
+    //Overall Transformation for the Boy Object
     glPushMatrix();
-    glTranslatef(0.0f, -0.40f, 0.0f);
+
+    // Position the boy on the screen
+    glTranslatef(boyPosX, boyPosY, 0.0f);
+
+    // Scale the boy to make him appear bigger/closer
+    glScalef(boyScale, boyScale, 1.0f);
+
+    // VBO setup (unchanged)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glBindBuffer(GL_ARRAY_BUFFER, boyVBO[0]);
     glVertexPointer(3, GL_FLOAT, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, boyVBO[1]);
     glColorPointer(3, GL_FLOAT, 0, 0);
-    glDrawArrays(GL_QUADS, 0, 52);
+
+    // --- 1. Draw Body/Arms/Head (first 9 Quads = 36 Vertices) ---
+    glDrawArrays(GL_QUADS, 0, 36);
+
+    // --- 2. Draw LEFT LEG and LEFT SHOE (Continuous Rotation) ---
+    glPushMatrix();
+    // Translate to the hip pivot point
+    glTranslatef(-0.025f, -0.16f, 0.0f);
+    //Only apply rotation if the boy is running
+    if (isBoyRunning) {
+        glRotatef(legRotateAngle, 0.0f, 0.0f, 1.0f);
+    }
+    // Translate back
+    glTranslatef(0.025f, 0.16f, 0.0f);
+
+    // Draw LEFT LEG and LEFT SHOE (indices 36 & 44)
+    glDrawArrays(GL_QUADS, 36, 4);
+    glDrawArrays(GL_QUADS, 44, 4);
+    glPopMatrix();
+
+    // --- 3. Draw RIGHT LEG and RIGHT SHOE (Continuous Rotation) ---
+    glPushMatrix();
+    // Translate to the hip pivot point
+    glTranslatef(0.025f, -0.16f, 0.0f);
+    // Apply SAME continuous rotation (since it's a wheel effect)
+    if (isBoyRunning) {
+        // Apply SAME continuous rotation (since it's a wheel effect)
+        glRotatef(legRotateAngle, 0.0f, 0.0f, 1.0f);
+    }
+    // Translate back
+    glTranslatef(-0.025f, 0.16f, 0.0f);
+
+    // Draw RIGHT LEG and RIGHT SHOE (indices 40 & 48)
+    glDrawArrays(GL_QUADS, 40, 4);
+    glDrawArrays(GL_QUADS, 48, 4);
+    glPopMatrix();
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
-    glPopMatrix();
+    glPopMatrix(); // Restore the matrix state before overall Boy transformations
 }
 
 void displayBirds() {
@@ -1332,10 +1387,6 @@ GLfloat ridgeColors[] = {
     0.18f, 0.23f, 0.45f, 0.5f
 };
 
-
-
-
-
 GLubyte ridgeIndices[] = {
     // Top ridge outline
     0,  1,
@@ -1388,4 +1439,56 @@ void displayMountains() {
     glDisableClientState(GL_COLOR_ARRAY);
 
     glDisable(GL_BLEND);
+}
+
+// ----------------------------------------------------------------
+// TIMER FUNCTION (BOY ANIMATION)
+// ----------------------------------------------------------------
+void animateBoyRun(int value) {
+    glutTimerFunc(16, animateBoyRun, 0);
+
+    if (isBoyRunning) {
+        //1. Horizontal Movement (Running Across Screen)
+        // Move from center (0.0f) to the left (-1.0f)
+        if (boyPosX > -1.2f) {
+            boyPosX -= 0.02f;
+        }
+        else {
+            // Loop the movement
+            boyScale = 0.0f;
+            isBoyRunning = false;
+            glutPostRedisplay(); // Draw the final (invisible) frame
+            return; // Exit the function to prevent further updates
+        }
+
+        // 2. Scaling (Approaching the User/Getting Bigger) 
+        // Scale from 1.0f up to 3.0f (stop when approaching)
+        if (boyScale < 3.0f) {
+            boyScale += 0.02f;
+        }
+        else {
+            boyScale = 3.0f; // Stop scaling
+        }
+
+        // --- 3. Cartoon Leg Rotation (Continuous) ---
+        legRotateAngle -= 45.0f;
+
+        glutPostRedisplay();
+    }
+}
+// ----------------------------------------------------------------
+// KEYBOARD HANDLER FOR ANIMATION OF BOY
+// ----------------------------------------------------------------
+void boyKeyboardFunc(unsigned char key, int x, int y) {
+    if (key == 's' || key == 'S') {
+        // 1. Perform a Full Reset 
+        // Always reset to the start state, regardless of stop or start
+        boyScale = 1.0f;
+        boyPosX = 0.0f;
+        legRotateAngle = 0.0f;  
+        // 2Toggle the State 
+        isBoyRunning = !isBoyRunning; // If the boy was stopped/vanished, this sets it to true, and Display() draws him.
+        
+        glutPostRedisplay();
+    }
 }
