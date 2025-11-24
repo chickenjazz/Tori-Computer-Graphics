@@ -1128,16 +1128,16 @@ void displayBirds() {
 // ----------------------------------------------------------------
 GLfloat fireVertices[] = {
     // 1. START POINT
-    0.4f,   0.4f,   0.0f,   // Center/Base
+    0.4f,   0.45f,   0.0f,   // Center/Base
     // 2. MOUTH FLARING
-    0.4f,   0.5f,   0.0f,   // Top corner
+    0.4f,   0.55f,   0.0f,   // Top corner
     // 3. THE JAGGED BEAM
-    -0.50f, 0.75f,  0.0f,   // Far Left
-    -0.35f, 0.55f,  0.0f,   // Mid Left
-    -0.70f, 0.40f,  0.0f,   // Furthest Left
-    -0.35f, 0.35f,  0.0f,   // Mid Left
+    -0.50f, 0.8f,  0.0f,   // Far Left
+    -0.35f, 0.6f,  0.0f,   // Mid Left
+    -0.70f, 0.45f,  0.0f,   // Furthest Left
+    -0.35f, 0.4f,  0.0f,   // Mid Left
     // 4. BOTTOM FLARE
-    -0.50f, 0.20f,  0.0f,   // Far Left
+    -0.50f, 0.25f,  0.0f,   // Far Left
 };
 
 GLfloat fireColors[] = {
