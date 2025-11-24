@@ -1785,26 +1785,74 @@ GLfloat fireVertices[] = {
 };
 
 GLfloat fireColors[] = {
-    0.9f, 1.0f, 1.0f,       // White-Hot Core
-    0.1f, 0.2f, 0.9f,       // Darker Blue
-    0.2f, 0.8f, 1.0f,       // Bright Neon Cyan
-    0.1f, 0.2f, 0.9f,       // Deep Blue
-    0.1f, 0.2f, 0.9f,       // Deep Blue
-    0.2f, 0.8f, 1.0f,       // Bright Neon Cyan
-    0.1f, 0.2f, 0.9f,       // Deep Blue
+    0.4f, 0.5f, 0.9f,        // Pale Blue)
+    0.05f, 0.1f, 0.4f,       // Dark Deep Blue
+    0.1f, 0.2f, 0.6f,        // Mid Blue
+    0.05f, 0.1f, 0.4f,       // Deep Blue
+    0.05f, 0.1f, 0.4f,       // Deep Blue
+    0.1f, 0.2f, 0.6f,        // Mid Blue
+    0.05f, 0.1f, 0.4f,       // Deep Blue
 };
 
 void displayFire() {
+    // 1. ENABLE LIGHTING
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_NORMALIZE);
+
+    // 2. CONFIGURE THE LIGHT (Atomic Blue Glow)
+    // Position: Mid-air in the path of the beam 
+    GLfloat lightPos[] = { -0.2f, 0.6f, 0.5f, 1.0f };
+
+    GLfloat lightAmbient[] = { 0.0f, 0.0f, 0.3f, 1.0f };  // Deep Blue ambient
+    GLfloat lightDiffuse[] = { 0.4f, 0.8f, 1.0f, 1.0f };  // Cyan/White main light
+    GLfloat lightSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // Bright white highlights
+
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
+
+    // 3. CONFIGURE MATERIAL (Glowing Effect)
+    // Emission allows the object to glow without an external light source
+    GLfloat matEmission[] = { 0.2f, 0.4f, 0.9f, 1.0f };
+    GLfloat matSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat matShininess[] = { 50.0f };
+
+    glMaterialfv(GL_FRONT, GL_EMISSION, matEmission);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+
+    // vertex color array (fireColors) to tint the light
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+    // 4. SET NORMAL (Face the camera)
+    glNormal3f(0.0f, 0.0f, 1.0f);
+
+    // 5. DRAW THE BEAM 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
+
     glVertexPointer(3, GL_FLOAT, 0, fireVertices);
     glColorPointer(3, GL_FLOAT, 0, fireColors);
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glDrawArrays(GL_POLYGON, 0, 7);
+
     glDisable(GL_BLEND);
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
+
+    // 6. CLEANUP (Reset Emission and Disable Lighting)
+    GLfloat noEmission[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    glMaterialfv(GL_FRONT, GL_EMISSION, noEmission);
+
+    glDisable(GL_COLOR_MATERIAL);
+    glDisable(GL_LIGHT0);
+    glDisable(GL_LIGHTING);
 }
 
 void animateFlock(int value) {
