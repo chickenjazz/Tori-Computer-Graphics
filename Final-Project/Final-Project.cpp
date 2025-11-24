@@ -21,7 +21,7 @@ void animateFlock(int value);
 void birdMovement(int key, int x, int y);
 void displayMountains();
 void animateBoyRun(int value);
-
+void drawBoyText();
 void setSnowColor(float r, float g, float b, float a);
 void drawSnowBalls();
 
@@ -517,6 +517,7 @@ void Display() {
     displayToriGate();
     snowpile();
     displayBoy();
+    drawBoyText();
     glPopMatrix(); // End ground shake
 
     // Birds fly smoothly (No shake)
@@ -2028,7 +2029,7 @@ void displayMountains() {
 // TIMER FUNCTION (BOY ANIMATION)
 // ----------------------------------------------------------------
 void animateBoyRun(int value) {
-    glutTimerFunc(16, animateBoyRun, 0);
+    glutTimerFunc(30, animateBoyRun, 0);
 
     if (isBoyRunning) {
         //1. Horizontal Movement (Running Across Screen)
@@ -2054,9 +2055,21 @@ void animateBoyRun(int value) {
         }
 
         // --- 3. Cartoon Leg Rotation (Continuous) ---
-        legRotateAngle -= 45.0f;
+        legRotateAngle -= 100.0f;
 
         glutPostRedisplay();
     }
 }
 
+void drawBoyText() {
+    // Only draw the text if the boy is currently running
+    if (isBoyRunning) {
+        glColor3f(1.0f, 1.0f, 1.0f); // Set text color to red
+        glRasterPos3f(boyPosX - -0.1f, - 0.3f, 0.0f);
+        const char* text = "HELPPPPP!!";
+        // Loop through the string and draw each character
+        for (int i = 0; text[i] != '\0'; i++) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
+        }
+    }
+}
