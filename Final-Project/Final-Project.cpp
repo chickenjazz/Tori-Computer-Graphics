@@ -1481,14 +1481,21 @@ void animateBoyRun(int value) {
 // ----------------------------------------------------------------
 void boyKeyboardFunc(unsigned char key, int x, int y) {
     if (key == 's' || key == 'S') {
-        // 1. Perform a Full Reset 
-        // Always reset to the start state, regardless of stop or start
-        boyScale = 1.0f;
-        boyPosX = 0.0f;
-        legRotateAngle = 0.0f;  
-        // 2Toggle the State 
-        isBoyRunning = !isBoyRunning; // If the boy was stopped/vanished, this sets it to true, and Display() draws him.
-        
+        // If the boy's scale is 0.0f, he has already finished his run 
+        if (boyScale == 0.0f) {
+            return;
+
+        }
+        // This block executes if the boy is currently visible/active (boyScale > 0.0f).
+        else {
+
+            // If the boy is currently running, reset the leg angle for a smooth stop.
+            if (isBoyRunning) {
+                legRotateAngle = 0.0f;
+            }
+            // Toggle the running state
+            isBoyRunning = !isBoyRunning;
+        }s
         glutPostRedisplay();
     }
 }
