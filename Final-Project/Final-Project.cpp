@@ -21,7 +21,6 @@ void animateFlock(int value);
 void birdMovement(int key, int x, int y);
 void displayMountains();
 void animateBoyRun(int value);
-void boyKeyboardFunc(unsigned char key, int x, int y);
 
 void setSnowColor(float r, float g, float b, float a);
 void drawSnowBalls();
@@ -139,6 +138,24 @@ void keyboardMonitor(unsigned char key, int x, int y) {
 
     if (key == '3') {
         isSnowing = !isSnowing;  // flip ON/OFF
+    }
+    if (key == 's' || key == 'S') {
+        // If the boy's scale is 0.0f, he has already finished his run 
+        if (boyScale == 0.0f) {
+            return;
+
+        }
+        // This block executes if the boy is currently visible/active (boyScale > 0.0f).
+        else {
+
+            // If the boy is currently running, reset the leg angle for a smooth stop.
+            if (isBoyRunning) {
+                legRotateAngle = 0.0f;
+            }
+            // Toggle the running state
+            isBoyRunning = !isBoyRunning;
+        }
+        glutPostRedisplay();
     }
 }
 
@@ -514,7 +531,6 @@ int main(int argc, char** argv) {
     glutTimerFunc(16, animateGodzilla, 0);
     glutTimerFunc(10000, animateGodzilla, 1);
     glutTimerFunc(16, animateBoyRun, 0);
-    glutKeyboardFunc(boyKeyboardFunc);
     glutKeyboardFunc(keyboardMonitor);
     glutMouseFunc(mouseCallback);
     glutDisplayFunc(Display);
@@ -1969,26 +1985,4 @@ void animateBoyRun(int value) {
         glutPostRedisplay();
     }
 }
-// ----------------------------------------------------------------
-// KEYBOARD HANDLER FOR ANIMATION OF BOY
-// ----------------------------------------------------------------
-void boyKeyboardFunc(unsigned char key, int x, int y) {
-    if (key == 's' || key == 'S') {
-        // If the boy's scale is 0.0f, he has already finished his run 
-        if (boyScale == 0.0f) {
-            return;
 
-        }
-        // This block executes if the boy is currently visible/active (boyScale > 0.0f).
-        else {
-
-            // If the boy is currently running, reset the leg angle for a smooth stop.
-            if (isBoyRunning) {
-                legRotateAngle = 0.0f;
-            }
-            // Toggle the running state
-            isBoyRunning = !isBoyRunning;
-        }s
-        glutPostRedisplay();
-    }
-}
