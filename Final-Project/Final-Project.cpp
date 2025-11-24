@@ -2,6 +2,7 @@
 #include <GL/glut.h>
 #include <cmath>
 #include <iostream>
+#define TIMER_ID_FLIGHT 1 // Timer ID for the animation loop
 
 using namespace std;
 
@@ -16,12 +17,17 @@ void initVBOs();
 void displayBirds();
 void mouseCallback(int button, int state, int x, int y);
 void animateGodzilla(int value);
+void animateFlock(int value);
+void birdMovement(int key, int x, int y);
 
 const int NUM_BIRDS = 15;
 const GLfloat BIRD_COLOR[] = { 0.0f, 0.0f, 0.0f };
 const GLfloat BIRD_SCALE = 0.020f;
 GLuint boyVBO[2];
 GLfloat birdOffsets[NUM_BIRDS * 2];
+GLfloat birdFlock_X = 50.0f; //Current X-position
+const GLfloat BIRD_FLOCK_SPEED = 0.005f; //Movement speed per frame
+int birdFlockDirection = 0; //Flag to control movement: -1 (Left), 1 (Right), 0 (Idle)
 
 bool isFiring = false;
 
@@ -34,6 +40,10 @@ float groundShake = 0.0f;
 float cloudOffset1 = 0.0f; // Horizon (Slowest)
 float cloudOffset2 = 0.0f; // Mid (Medium)
 float cloudOffset3 = 0.0f; // High (Fastest)
+
+
+
+
 
 // ----------------------------------------------------------------
 // HELPER: DRAW A CLOUD (Procedural Circles)
@@ -339,13 +349,13 @@ int main(int argc, char** argv) {
         birdOffsets[i * 2] = ((float)rand() / RAND_MAX * flockSpreadX) - (flockSpreadX / 2.0f);
         birdOffsets[i * 2 + 1] = ((float)rand() / RAND_MAX * flockSpreadY) - (flockSpreadY / 2.0f);
     }
-
+    glutSpecialFunc(birdMovement);
+    glutTimerFunc(0, animateFlock, TIMER_ID_FLIGHT);
     glutTimerFunc(16, animateGodzilla, 0);
     glutTimerFunc(10000, animateGodzilla, 1);
     glutMouseFunc(mouseCallback);
     glutDisplayFunc(Display);
     glutMainLoop();
-
     return 0;
 }
 
@@ -1095,17 +1105,17 @@ void displayBoy() {
 
 void displayBirds() {
     glColor3fv(BIRD_COLOR);
-    GLfloat flockCenterX = 0.6f;
     GLfloat flockCenterY = 0.8f;
     glBegin(GL_TRIANGLES);
     for (int i = 0; i < NUM_BIRDS; ++i) {
         GLfloat xOffset = birdOffsets[i * 2];
         GLfloat yOffset = birdOffsets[i * 2 + 1];
-        GLfloat birdX = flockCenterX + xOffset;
+        GLfloat birdX = birdFlock_X + xOffset;
         GLfloat birdY = flockCenterY + yOffset;
         glVertex3f(birdX - BIRD_SCALE * 1.5f, birdY, 0.0f);
         glVertex3f(birdX, birdY + BIRD_SCALE, 0.0f);
         glVertex3f(birdX - BIRD_SCALE * 0.5f, birdY + BIRD_SCALE * 0.5f, 0.0f);
+
         glVertex3f(birdX + BIRD_SCALE * 1.5f, birdY, 0.0f);
         glVertex3f(birdX, birdY + BIRD_SCALE, 0.0f);
         glVertex3f(birdX + BIRD_SCALE * 0.5f, birdY + BIRD_SCALE * 0.5f, 0.0f);
@@ -1152,3 +1162,61 @@ void displayFire() {
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
 }
+
+void animateFlock(int value) {
+    if (value != TIMER_ID_FLIGHT) return;
+    if (birdFlockDirection != 0) {
+        // Update the position: decreases X when direction is -1 (Left), increases when 1 (Right)
+        birdFlock_X += birdFlockDirection * BIRD_FLOCK_SPEED;
+
+        // Boundary Check: Loop the birds back when they go off-screen
+        if (birdFlock_X < -1.0f) {
+            // When birds disappear far left, reposition them far right
+            birdFlock_X = 1.2f;
+        }
+        else if (birdFlock_X > 1.2f) {
+            // When birds disappear far right, reposition them far left
+            birdFlock_X = -1.0f;
+        }
+        glutPostRedisplay();
+    }
+
+    //Reschedule the timer function for the next frame (~16ms for 60 FPS)
+    glutTimerFunc(16, animateFlock, TIMER_ID_FLIGHT);
+}
+
+void birdMovement(int key, int x, int y) {
+    // Variable to store the intended new direction
+    int newDirection = 0;
+    if (key == GLUT_KEY_LEFT) {
+        newDirection = -1;
+    }
+    else if (key == GLUT_KEY_RIGHT) {
+        newDirection = 1;
+    }
+    // Only proceed if a valid directional key was pressed
+    if (newDirection != 0) {
+        //CHECK FOR INITIAL SPAWN: 
+        if (birdFlockDirection == 0) {
+            // Set the direction
+            birdFlockDirection = newDirection;
+            // Set the off-screen spawn point based on the direction
+            if (birdFlockDirection == -1) {
+                // Fly Left: Spawn off-screen right (e.g., 1.2f)
+                birdFlock_X = 1.2f;
+            }
+            else if (birdFlockDirection == 1) {
+                // Fly Right: Spawn off-screen left (e.g., -1.2f)
+                birdFlock_X = -1.2f;
+            }
+
+        }
+        else {
+            // 2. MID-FLIGHT CHANGE: If the birds are already flying, just update direction.
+            birdFlockDirection = newDirection;
+        }
+    }
+    // Request a redraw immediately to start or change the visual movement
+    glutPostRedisplay();
+}
+
