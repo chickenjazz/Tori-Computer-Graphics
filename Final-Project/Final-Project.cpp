@@ -976,17 +976,18 @@ GLfloat boyVertices[] = {
      0.035f, -0.04f, 0.0f,  // Bottom-Right
     -0.035f, -0.04f, 0.0f,  // Bottom-Left
 
+    // 3. HAIR BACK LAYER
+-0.040f,  0.04f, 0.0f,  // Top-Left (Slightly overlaps main hair)
+ 0.040f,  0.04f, 0.0f,  // Top-Right
+ 0.025f, -0.01f, 0.0f,  // Bottom-Right (Tapered in towards the center)
+-0.025f, -0.01f, 0.0f,  // Bottom-Left
+
+
     // 2. HAIR TOP VOLUME - Main block
     -0.045f,  0.08f, 0.0f,  // Top-Left 
      0.045f,  0.08f, 0.0f,  // Top-Right
      0.045f,  0.03f, 0.0f,  // Bottom-Right (Aligns with head top)
     -0.045f,  0.03f, 0.0f,  // Bottom-Left
-
-    // 3. HAIR BACK LAYER
-    -0.040f,  0.04f, 0.0f,  // Top-Left (Slightly overlaps main hair)
-     0.040f,  0.04f, 0.0f,  // Top-Right
-     0.025f, -0.01f, 0.0f,  // Bottom-Right (Tapered in towards the center)
-    -0.025f, -0.01f, 0.0f,  // Bottom-Left
 
     // 4. NECK (Skin)
     -0.015f, -0.04f, 0.0f,  // Top-Left
@@ -1051,31 +1052,82 @@ GLfloat boyVertices[] = {
 
 GLfloat boyColors[] = {
     // 1. HEAD (Skin Tone)
-    0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f,
+    0.96f, 0.73f, 0.58f,  // Top-Left
+    0.96f, 0.73f, 0.58f,  // Top-Right
+    0.78f, 0.6f, 0.55f,  // Bottom-Right
+    0.78f, 0.6f, 0.55f,  // Bottom-Left
+
+    // 3. HAIR (BACK LAYER - Same Dark Hair Color)
+    0.2f, 0.1f, 0.2f,   // Top-Left
+    0.2f, 0.1f, 0.2f,   // Top-Right
+    0.3f, 0.2f, 0.3f,   // Bottom-Right
+    0.3f, 0.2f, 0.3f,   // Bottom-Left
+
     // 2. HAIR (TOP VOLUME - Dark Purple/Brown)
-    0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f,
-    // 3. HAIR (BACK LAYER - Same Dark Hair Color) 
-    0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f, 0.2f, 0.1f, 0.2f,
+    0.2f, 0.1f, 0.2f,   // Top-Left
+    0.2f, 0.1f, 0.2f,   // Top-Right
+    0.2f, 0.1f, 0.2f,   // Bottom-Right
+    0.2f, 0.1f, 0.2f,   // Bottom-Left
+
     // 4. NECK (Skin Tone)
-    0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f,
+    0.76f, 0.63f, 0.58f,  // Top-Left
+    0.76f, 0.63f, 0.58f,  // Top-Right
+    0.96f, 0.73f, 0.58f,  // Bottom-Right
+    0.96f, 0.73f, 0.58f,  // Bottom-Left
+
     // 5. BODY (Maroon/Reddish-Purple Shirt)
-    0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f,
+    0.49f, 0.22f, 0.35f,  // Top-Left
+    0.69f, 0.22f, 0.35f,  // Top-Right
+    0.49f, 0.22f, 0.35f,  // Bottom-Right
+    0.69f, 0.22f, 0.35f,  // Bottom-Left
+
     // 6. LEFT ARM (Maroon/Reddish-Purple Shirt)
-    0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f,
+    0.69f, 0.22f, 0.35f,  // Top-Left
+    0.49f, 0.22f, 0.35f,  // Top-Right
+    0.49f, 0.22f, 0.35f,  // Bottom-Right
+    0.69f, 0.22f, 0.35f,  // Bottom-Left
+
     // 7. RIGHT ARM (Maroon/Reddish-Purple Shirt)
-    0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f, 0.69f, 0.22f, 0.35f,
+    0.49f, 0.22f, 0.35f,  // Top-Left
+    0.69f, 0.22f, 0.35f,  // Top-Right
+    0.69f, 0.22f, 0.35f,  // Bottom-Right
+    0.49f, 0.22f, 0.35f,  // Bottom-Left
+
     // 8. LEFT HAND (Skin Tone)
-    0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f,
+    0.96f, 0.73f, 0.58f,  // Top-Left
+    0.96f, 0.73f, 0.58f,  // Top-Right
+    0.96f, 0.73f, 0.58f,  // Bottom-Right
+    0.96f, 0.73f, 0.58f,  // Bottom-Left
+
     // 9. RIGHT HAND (Skin Tone)
-    0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f, 0.96f, 0.73f, 0.58f,
+    0.96f, 0.73f, 0.58f,  // Top-Left
+    0.96f, 0.73f, 0.58f,  // Top-Right
+    0.96f, 0.73f, 0.58f,  // Bottom-Right
+    0.96f, 0.73f, 0.58f,  // Bottom-Left
+
     // 10. LEFT LEG (Blue Jeans)
-    0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f,
+    0.2f, 0.25f, 0.4f,   // Top-Left
+    0.3f, 0.45f, 0.6f,   // Top-Right
+    0.2f, 0.25f, 0.4f,   // Bottom-Right
+    0.3f, 0.45f, 0.6f,   // Bottom-Left
+
     // 11. RIGHT LEG (Blue Jeans)
-    0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f, 0.3f, 0.45f, 0.6f,
+    0.3f, 0.45f, 0.6f,   // Top-Left
+    0.2f, 0.25f, 0.4f,   // Top-Right
+    0.3f, 0.45f, 0.6f,   // Bottom-Right
+    0.2f, 0.25f, 0.4f,   // Bottom-Left
+
     // 12. LEFT SHOE (Dark Red/Purple)
-    0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f,
+    0.4f, 0.15f, 0.2f,   // Top-Left
+    0.4f, 0.15f, 0.2f,   // Top-Right
+    0.4f, 0.15f, 0.2f,   // Bottom-Right
+    0.4f, 0.15f, 0.2f,   // Bottom-Left
+
     // 13. RIGHT SHOE (Dark Red/Purple)
-    0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f, 0.4f, 0.15f, 0.2f,
+    0.4f, 0.15f, 0.2f,   // Top-Left
+    0.4f, 0.15f, 0.2f,   // Top-Right
+    0.4f, 0.15f, 0.2f,   // Bottom-Right
+    0.4f, 0.15f, 0.2f,   // Bottom-Left
 };
 
 void initVBOs() {
