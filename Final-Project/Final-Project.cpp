@@ -20,6 +20,8 @@ void animateGodzilla(int value);
 void animateFlock(int value);
 void birdMovement(int key, int x, int y);
 void displayMountains();
+void setSnowColor(float r, float g, float b, float a);
+void drawSnowBalls();
 
 const int NUM_BIRDS = 15;
 const GLfloat BIRD_COLOR[] = { 0.0f, 0.0f, 0.0f };
@@ -34,6 +36,7 @@ float transition = 0.0f;
 bool isTransitioning = false;
 float targetMode = 0;
 bool isFiring = false;
+bool isSnowing = false;
 
 // --- ANIMATION VARIABLES ---
 float godzillaX = 1.0f;
@@ -47,6 +50,9 @@ float cloudOffset3 = 0.0f; // High (Fastest)
 
 inline float mixf(float a, float b, float t);//for intepolation (transition)
 
+const int totalSnowBalls = 200; // number of snowballs
+float snowXs[200];
+float snowYs[200];
 
 
 // ----------------------------------------------------------------
@@ -120,6 +126,10 @@ void keyboardMonitor(unsigned char key, int x, int y) {
         targetMode = 1.0f; // Dawn
         isTransitioning = true;
     }
+
+    if (key == '3') {
+        isSnowing = !isSnowing;  // flip ON/OFF
+    }
 }
 
 // ----------------------------------------------------------------
@@ -165,6 +175,46 @@ void animateBackground(int value) {
 
     glutTimerFunc(16, animateBackground, 0);
 }
+
+void animateSnowfall(int value) {
+    if (isSnowing) {
+        for (int i = 0; i < totalSnowBalls; i++) {
+            snowYs[i] -= 0.02f;
+
+            if (snowYs[i] < -1.0f) {
+                snowYs[i] = 1.0f;
+                snowXs[i] = ((float)(rand() % 100) / 50.0f) - 1.0f;
+            }
+        }
+    }
+
+    glutPostRedisplay();
+    glutTimerFunc(16, animateSnowfall, 0);
+}
+void drawSnowBalls() {
+    if (!isSnowing) return; 
+
+    glPointSize(5.0f);
+    glBegin(GL_POINTS);
+
+    for (int i = 0; i < totalSnowBalls; i++) {
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.25f);
+        glVertex2f(snowXs[i], snowYs[i]);
+    }
+
+    glEnd();
+}
+ //---------------------------------------------------------------
+// INITIALIZE SNOWBALLS
+ //---------------------------------------------------------------
+void initSnowBalls() {
+    for (int i = 0; i < totalSnowBalls; i++) {
+        snowXs[i] = ((float)(rand() % 100) / 50.0f) - 1.0f;   // random X (-1 to 1)
+        snowYs[i] = ((float)(rand() % 100) / 50.0f);          // random Y (0 to 2)
+    }
+}
+
+
 
 // ----------------------------------------------------------------
 // MOUSE CALLBACK
@@ -372,16 +422,16 @@ void displayBackground() {
         heightFactor = fminf(fmaxf(heightFactor, 0.0f), 1.0f);
 
         // Surface snow color
-        float r = 0.85f + (0.15f * heightFactor);
-        float g = 0.90f + (0.10f * heightFactor);
-        float b = 0.95f + (0.05f * heightFactor);
+        float r = 0.9f + (0.15f * heightFactor);
+        float g = 0.95f + (0.10f * heightFactor);
+        float b = 1.0f + (0.05f * heightFactor);
 
         // Apply darkening automatically
         applySnowFieldColor(r, g, b);
         glVertex3f(x, yBumpy, 0.0f);
 
         // Underground color
-        applySnowFieldColor(0.40f, 0.45f, 0.55f);
+        applySnowFieldColor(0.50f, 0.55f, 0.75f);
         glVertex3f(x, snowBottom, 0.0f);
     }
     glEnd();
@@ -399,7 +449,8 @@ void Display() {
     glTranslatef(0.0f, groundShake, 0.0f);
     displayBackground();
     displayMountains();
-
+    
+    
     // Draw Godzilla (He shakes independently)
     glPushMatrix();
     glTranslatef(godzillaX, godzillaY, 0.0f);
@@ -417,6 +468,7 @@ void Display() {
 
     // Birds fly smoothly (No shake)
     displayBirds();
+    drawSnowBalls();
 
     glutSwapBuffers();
 }
@@ -444,8 +496,10 @@ int main(int argc, char** argv) {
         birdOffsets[i * 2] = ((float)rand() / RAND_MAX * flockSpreadX) - (flockSpreadX / 2.0f);
         birdOffsets[i * 2 + 1] = ((float)rand() / RAND_MAX * flockSpreadY) - (flockSpreadY / 2.0f);
     }
+    initSnowBalls();
     glutSpecialFunc(birdMovement);
     glutTimerFunc(0, animateFlock, TIMER_ID_FLIGHT);
+    glutTimerFunc(16, animateSnowfall, 0);
     glutTimerFunc(16, animateBackground, 0);
     glutTimerFunc(16, animateGodzilla, 0);
     glutTimerFunc(1000, animateGodzilla, 1);
@@ -794,63 +848,25 @@ void snowpile() {
     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 
     // =========================================================
-    // LAYER 3: RANDOM SNOW CHUNKS (GL_POINTS)
-    // =========================================================
-    glPointSize(20.0f); // Big chunky snowballs
-    glBegin(GL_POINTS);
-    setSnowColor(0.9f, 0.95f, 1.0f, 0.25f); // Almost pure white
-
-    srand(50);
-
-    for (int i = 0; i < 10000; i++) {
-        // Random X between -1.0 and 1.0
-        float rX = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-
-        // Random Y between -1.0 and -0.6 (Snowfield area)
-        float rY = -1.0f + ((float)rand() / RAND_MAX) * 0.38f;
-
-        glVertex3f(rX, rY, 0.0f);
-    }
-    glEnd();
-
-    glPointSize(18.0f); // Big chunky snowballs
-    glBegin(GL_POINTS);
-    setSnowColor(1.0f, 1.0f, 1.0f, 0.15f); // pure white
-
-    // Use a constant seed so they don't jitter every frame
-    srand(50);
-
-    for (int i = 0; i < 5000; i++) {
-        // Random X between -1.0 and 1.0
-        float rX = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-
-        // Random Y between -1.0 and -0.6 (Snowfield area)
-        float rY = -1.0f + ((float)rand() / RAND_MAX) * 0.38f;
-
-        glVertex3f(rX, rY, 0.0f);
-    }
-    glEnd();
-
-    // =========================================================
-    // LAYER 2: ORIGINAL PILES (Foreground)
+    // LAYER 2: SNOW PILES (Foreground)
     // Updated to use glColor4f for blending
     // =========================================================
    
     // PILE 1: FAR LEFT
         glBegin(GL_POLYGON);
 
-        setSnowColor(0.85f, 0.85f, 0.95f, 0.65f);   // Base
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.9f);   // Base
         glVertex3f(-0.95f, -0.90f, 0.0f);
         glVertex3f(-0.85f, -0.92f, 0.0f);
         glVertex3f(-0.70f, -0.90f, 0.0f);
 
-        setSnowColor(1.0f, 1.0f, 1.0f, 0.65f);      // Top highlight
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.39f);      // Top highlight
         glVertex3f(-0.65f, -0.80f, 0.0f);
         glVertex3f(-0.72f, -0.70f, 0.0f);
         glVertex3f(-0.80f, -0.75f, 0.0f);
         glVertex3f(-0.88f, -0.68f, 0.0f);
 
-        setSnowColor(0.95f, 0.95f, 1.0f, 0.65f);
+        setSnowColor(0.95f, 0.95f, 1.0f, 0.59f);
         glVertex3f(-0.98f, -0.80f, 0.0f);
         glEnd();
 
@@ -858,12 +874,12 @@ void snowpile() {
         // PILE 2: MID LEFT
         glBegin(GL_POLYGON);
 
-        setSnowColor(0.85f, 0.85f, 0.95f, 0.65f);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.9f);
         glVertex3f(-0.60f, -0.85f, 0.0f);
         glVertex3f(-0.50f, -0.88f, 0.0f);
         glVertex3f(-0.35f, -0.85f, 0.0f);
 
-        setSnowColor(1.0f, 1.0f, 1.0f, 0.85f);
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.49f);
         glVertex3f(-0.38f, -0.75f, 0.0f);
         glVertex3f(-0.42f, -0.65f, 0.0f);
         glVertex3f(-0.48f, -0.70f, 0.0f);
@@ -875,11 +891,11 @@ void snowpile() {
         // PILE 3: CENTER LEFT
         glBegin(GL_POLYGON);
 
-        setSnowColor(0.85f, 0.85f, 0.95f, 0.65f);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.98f);
         glVertex3f(-0.3f, -0.75f, 0.0f);
         glVertex3f(-0.2f, -0.78f, 0.0f);
 
-        setSnowColor(1.0f, 1.0f, 1.0f, 0.85f);
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.98f);
         glVertex3f(-0.15f, -0.65f, 0.0f);
         glVertex3f(-0.19f, -0.68f, 0.0f);
         glVertex3f(-0.23f, -0.62f, 0.0f);
@@ -892,11 +908,11 @@ void snowpile() {
         // PILE 4: CENTER RIGHT
         glBegin(GL_POLYGON);
 
-        setSnowColor(0.85f, 0.85f, 0.95f, 0.75f);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.98f);
         glVertex3f(0.15f, -0.70f, 0.0f);
         glVertex3f(0.25f, -0.72f, 0.0f);
 
-        setSnowColor(1.0f, 1.0f, 1.0f, 0.55f);
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.98f);
         glVertex3f(0.35f, -0.70f, 0.0f);
         glVertex3f(0.45f, -0.65f, 0.0f);
         glVertex3f(0.38f, -0.57f, 0.0f);
@@ -909,11 +925,11 @@ void snowpile() {
         // PILE 5: MID RIGHT
         glBegin(GL_POLYGON);
 
-        setSnowColor(0.85f, 0.85f, 0.95f, 0.65f);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.49f);
         glVertex3f(0.50f, -0.85f, 0.0f);
         glVertex3f(0.65f, -0.85f, 0.0f);
 
-        setSnowColor(1.0f, 1.0f, 1.0f, 0.85f);
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.4f);
         glVertex3f(0.70f, -0.75f, 0.0f);
         glVertex3f(0.62f, -0.65f, 0.0f);
         glVertex3f(0.58f, -0.70f, 0.0f);
@@ -926,11 +942,11 @@ void snowpile() {
         // PILE 6: FAR RIGHT
         glBegin(GL_POLYGON);
 
-        setSnowColor(0.85f, 0.85f, 0.95f, 0.85f);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.8f);
         glVertex3f(0.75f, -0.90f, 0.0f);
         glVertex3f(0.95f, -0.90f, 0.0f);
 
-        setSnowColor(1.0f, 1.0f, 1.0f, 0.55f);
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.8f);
         glVertex3f(0.98f, -0.80f, 0.0f);
         glVertex3f(0.92f, -0.72f, 0.0f);
         glVertex3f(0.88f, -0.75f, 0.0f);
@@ -939,6 +955,357 @@ void snowpile() {
         glVertex3f(0.72f, -0.85f, 0.0f);
         glEnd();
 
+        // PILE 6
+        glBegin(GL_POLYGON);
+
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.5f);
+        glVertex3f(0.4f, -1.00f, 0.0f);
+        glVertex3f(0.45f, -1.00f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.5f);
+        glVertex3f(0.50f, -0.95f, 0.0f);
+        glVertex3f(0.42f, -0.85f, 0.0f);
+        glVertex3f(0.38f, -0.90f, 0.0f);
+        glVertex3f(0.35f, -0.88f, 0.0f);
+        glVertex3f(0.32f, -0.95f, 0.0f);
+        glVertex3f(0.28f, -1.0f, 0.0f);
+        glEnd();
+
+        // PILE 7: LOW LEFT FILLER
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.589f);
+        glVertex3f(-0.85f, -0.95f, 0.0f);
+        glVertex3f(-0.75f, -0.96f, 0.0f);
+        glVertex3f(-0.65f, -0.95f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.59f);
+        glVertex3f(-0.68f, -0.88f, 0.0f);
+        glVertex3f(-0.75f, -0.85f, 0.0f);
+        glVertex3f(-0.82f, -0.88f, 0.0f);
+        glEnd();
+
+        // PILE 9: RIGHT SIDE GAP FILL
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.59f);
+        glVertex3f(0.35f, -0.90f, 0.0f);
+        glVertex3f(0.45f, -0.92f, 0.0f);
+        glVertex3f(0.55f, -0.90f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.59f);
+        glVertex3f(0.52f, -0.82f, 0.0f);
+        glVertex3f(0.45f, -0.78f, 0.0f);
+        glVertex3f(0.38f, -0.82f, 0.0f);
+        glEnd();
+
+        // PILE 10: FAR LEFT EDGE (SMALL)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.5f);
+        glVertex3f(-0.99f, -0.85f, 0.0f);
+        glVertex3f(-0.95f, -0.87f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.5f);
+        glVertex3f(-0.94f, -0.78f, 0.0f);
+        glVertex3f(-0.97f, -0.75f, 0.0f);
+        glEnd();
+
+
+        // PILE 12: BACKGROUND RIGHT (BEHIND GATE)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.4f);
+        glVertex3f(0.15f, -0.92f, 0.0f);
+        glVertex3f(0.25f, -0.94f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.5f);
+        glVertex3f(0.22f, -0.85f, 0.0f);
+        glVertex3f(0.18f, -0.85f, 0.0f);
+        glEnd();
+
+        // PILE 13: MID-RIGHT FOREGROUND
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.39f);
+        glVertex3f(0.60f, -0.88f, 0.0f);
+        glVertex3f(0.70f, -0.90f, 0.0f);
+        glVertex3f(0.80f, -0.88f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.2f);
+        glVertex3f(0.75f, -0.82f, 0.0f);
+        glVertex3f(0.70f, -0.78f, 0.0f);
+        glVertex3f(0.65f, -0.82f, 0.0f);
+        glEnd();
+
+        // PILE 14: VERY FAR RIGHT
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.52f);
+        glVertex3f(0.85f, -0.70f, 0.0f);
+        glVertex3f(0.92f, -0.72f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.21f);
+        glVertex3f(0.95f, -0.65f, 0.0f);
+        glVertex3f(0.88f, -0.62f, 0.0f);
+        glEnd();
+
+        // PILE 15: RANDOM BUMP CENTER LEFT 
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.6f);
+        glVertex3f(-0.30f, -0.88f, 0.0f);
+        glVertex3f(-0.10f, -0.90f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.6f);
+        glVertex3f(-0.12f, -0.80f, 0.0f);
+        glVertex3f(-0.18f, -0.76f, 0.0f); 
+        glVertex3f(-0.24f, -0.76f, 0.0f); 
+        glVertex3f(-0.28f, -0.82f, 0.0f);
+        glEnd();
+
+        // PILE 16: LEFT CENTER GAP (Curvy irregular)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.51f);
+        glVertex3f(-0.45f, -0.88f, 0.0f);
+        glVertex3f(-0.30f, -0.90f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.51f);
+        glVertex3f(-0.28f, -0.82f, 0.0f);
+        glVertex3f(-0.32f, -0.76f, 0.0f); 
+        glVertex3f(-0.42f, -0.78f, 0.0f); 
+        glVertex3f(-0.48f, -0.80f, 0.0f);
+        glEnd();
+
+        // PILE 17: RIGHT CENTER GAP (Curvy irregular)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.1f);
+        glVertex3f(0.30f, -0.90f, 0.0f);
+        glVertex3f(0.48f, -0.88f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.1f);
+        glVertex3f(0.50f, -0.80f, 0.0f);
+        glVertex3f(0.44f, -0.76f, 0.0f); // Curve
+        glVertex3f(0.36f, -0.76f, 0.0f); // Curve
+        glVertex3f(0.28f, -0.82f, 0.0f);
+        glEnd();
+
+        // PILE 18: CENTER FILLER (Small Mound)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.1f);
+        glVertex3f(-0.05f, -1.0f, 0.0f);
+        glVertex3f(0.12f, -1.0f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.1f);
+        glVertex3f(0.10f, -0.98f, 0.0f);
+        glVertex3f(0.04f, -0.94f, 0.0f); // Peak
+        glVertex3f(-0.02f, -0.94f, 0.0f); // Peak
+        glVertex3f(-0.08f, -0.96f, 0.0f);
+        glEnd();
+
+        // PILE 19: DEEP BACKGROUND LEFT (Round Hill)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.81f);
+        glVertex3f(-0.65f, -0.68f, 0.0f);
+        glVertex3f(-0.50f, -0.65f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.72f);
+        glVertex3f(-0.48f, -0.58f, 0.0f);
+        glVertex3f(-0.55f, -0.54f, 0.0f); // Round Top
+        glVertex3f(-0.62f, -0.54f, 0.0f); // Round Top
+        glVertex3f(-0.68f, -0.60f, 0.0f);
+        glEnd();
+
+        // PILE 22: LONG FOREGROUND RIGHT (Wavy)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.95f);
+        glVertex3f(0.65f, -0.65f, 0.0f);
+        glVertex3f(0.85f, -0.55f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.85f);
+        glVertex3f(1.3f, -1.0f, 0.0f);
+        glVertex3f(0.85f, -0.73f, 0.0f); // Wave
+        glVertex3f(0.80f, -0.73f, 0.0f); // Wave
+        glVertex3f(0.60f, -1.2f, 0.0f);
+        glEnd();
+
+        // PILE 20: DEEP BACKGROUND RIGHT (Round Hill)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.1f);
+        glVertex3f(0.50f, -0.65f, 0.0f);
+        glVertex3f(0.65f, -0.68f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.15f);
+        glVertex3f(0.68f, -0.60f, 0.0f);
+        glVertex3f(0.60f, -0.54f, 0.0f); // Round Top
+        glVertex3f(0.55f, -0.54f, 0.0f); // Round Top
+        glVertex3f(0.48f, -0.58f, 0.0f);
+        glEnd();
+
+        // PILE 21: LONG FOREGROUND LEFT (Wavy)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.53f);
+        glVertex3f(-0.85f, -1.0f, 0.0f);
+        glVertex3f(-0.45f, -1.2f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.7f);
+        glVertex3f(-0.40f, -1.2f, 0.0f);
+        glVertex3f(-0.55f, -0.78f, 0.0f); // Wave up
+        glVertex3f(-1.0f, -0.58f, 0.0f); // Wave
+        glVertex3f(-1.20f, -1.0f, 0.0f);
+        glEnd();
+
+        // PILE 22: LONG FOREGROUND RIGHT (Wavy)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.75f);
+        glVertex3f(0.45f, -1.0f, 0.0f);
+        glVertex3f(0.85f, -1.0f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.85f);
+        glVertex3f(1.3f, -1.0f, 0.0f);
+        glVertex3f(0.85f, -0.73f, 0.0f); // Wave
+        glVertex3f(0.80f, -0.73f, 0.0f); // Wave
+        glVertex3f(0.60f, -1.2f, 0.0f);
+        glEnd();
+
+
+
+        // PILE 23: FAR LEFT GAP (Round Wedge)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.75f);
+        glVertex3f(-0.95f, -0.72f, 0.0f);
+        glVertex3f(-0.82f, -0.75f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.75f);
+        glVertex3f(-0.80f, -0.65f, 0.0f);
+        glVertex3f(-0.86f, -0.60f, 0.0f); // Round Tip
+        glVertex3f(-0.92f, -0.60f, 0.0f); // Round Tip
+        glVertex3f(-0.98f, -0.65f, 0.0f);
+        glEnd();
+
+        // PILE 24: FAR RIGHT GAP (Round Wedge)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.75f);
+        glVertex3f(0.82f, -0.75f, 0.0f);
+        glVertex3f(0.95f, -0.72f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.75f);
+        glVertex3f(0.98f, -0.65f, 0.0f);
+        glVertex3f(0.92f, -0.60f, 0.0f); // Round Tip
+        glVertex3f(0.86f, -0.60f, 0.0f); // Round Tip
+        glVertex3f(0.80f, -0.65f, 0.0f);
+        glEnd();
+
+        // PILE 25: BEHIND PILE 1 (Round Mound)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.55f);
+        glVertex3f(-0.90f, -0.68f, 0.0f);
+        glVertex3f(-0.70f, -0.66f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.55f);
+        glVertex3f(-0.68f, -0.58f, 0.0f);
+        glVertex3f(-0.75f, -0.54f, 0.0f); // Curve
+        glVertex3f(-0.85f, -0.54f, 0.0f); // Curve
+        glVertex3f(-0.95f, -0.60f, 0.0f);
+        glEnd();
+
+        // PILE 26: BEHIND PILE 6 (Round Mound)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.15f);
+        glVertex3f(0.70f, -0.66f, 0.0f);
+        glVertex3f(0.90f, -0.68f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.75f);
+        glVertex3f(0.95f, -0.60f, 0.0f);
+        glVertex3f(0.88f, -0.54f, 0.0f); // Curve
+        glVertex3f(0.78f, -0.54f, 0.0f); // Curve
+        glVertex3f(0.68f, -0.58f, 0.0f);
+        glEnd();
+
+        // PILE 27: TINY FOREGROUND LEFT (Round Bump)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.95f);
+        glVertex3f(-0.20f, -0.90f, 0.0f);
+        glVertex3f(-0.05f, -0.91f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.95f);
+        glVertex3f(-0.02f, -0.85f, 0.0f);
+        glVertex3f(-0.08f, -0.82f, 0.0f); // Top
+        glVertex3f(-0.16f, -0.82f, 0.0f); // Top
+        glVertex3f(-0.22f, -0.85f, 0.0f);
+        glEnd();
+
+        // PILE 28: TINY FOREGROUND RIGHT (Round Bump)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.05f);
+        glVertex3f(0.05f, -0.91f, 0.0f);
+        glVertex3f(0.20f, -0.90f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.15f);
+        glVertex3f(0.22f, -0.85f, 0.0f);
+        glVertex3f(0.16f, -0.82f, 0.0f); // Top
+        glVertex3f(0.08f, -0.82f, 0.0f); // Top
+        glVertex3f(0.02f, -0.85f, 0.0f);
+        glEnd();
+
+    
+
+        // PILE 30: LOW CRAGGY RIGHT (Rounded)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.95f);
+        glVertex3f(0.62f, -0.64f, 0.0f);
+        glVertex3f(0.92f, -0.62f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.95f);
+        glVertex3f(0.95f, -0.55f, 0.0f);
+        glVertex3f(0.86f, -0.52f, 0.0f); // Top
+        glVertex3f(0.78f, -0.52f, 0.0f); // Top
+        glVertex3f(0.70f, -0.55f, 0.0f);
+        glEnd();
+
+        // PILE 31: LARGE FAR RIGHT BACKGROUND (High Opacity)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.90f, 0.90f, 0.98f, 0.95f); // High alpha Base
+        glVertex3f(0.75f, -0.65f, 0.0f);
+        glVertex3f(1.05f, -0.68f, 0.0f); // Wide base going off-screen
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 1.0f); // Solid white top
+        glVertex3f(1.1f, -0.58f, 0.0f);
+        glVertex3f(1.0f, -0.52f, 0.0f); // High peak
+        glVertex3f(0.85f, -0.54f, 0.0f); // Lumpy top
+        glVertex3f(0.72f, -0.60f, 0.0f);
+        glEnd();
+
+        // PILE 32: MID-RIGHT MIDGROUND FILLER (High Opacity)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.88f, 0.88f, 0.96f, 0.9f); // Base
+        glVertex3f(0.55f, -0.72f, 0.0f);
+        glVertex3f(0.75f, -0.74f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.95f); // Top
+        glVertex3f(0.78f, -0.65f, 0.0f);
+        glVertex3f(0.70f, -0.62f, 0.0f); // Lumpy
+        glVertex3f(0.60f, -0.62f, 0.0f); // Lumpy
+        glVertex3f(0.52f, -0.68f, 0.0f);
+        glEnd();
+
+        // PILE 33: LARGE RIGHT FOREGROUND (Lower Opacity - closer)
+        glBegin(GL_POLYGON);
+        setSnowColor(0.85f, 0.85f, 0.95f, 0.6f); // Lower alpha base
+        glVertex3f(0.65f, -0.95f, 0.0f);
+        glVertex3f(0.95f, -0.98f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 0.7f); // Lower alpha top
+        glVertex3f(0.98f, -0.85f, 0.0f);
+        glVertex3f(0.88f, -0.82f, 0.0f); // Round top
+        glVertex3f(0.75f, -0.82f, 0.0f); // Round top
+        glVertex3f(0.62f, -0.88f, 0.0f);
+        glEnd();
+
+        // PILE 34: EXTRA FAR RIGHT EDGE (Solid Opacity - background)
+        glBegin(GL_POLYGON);
+        setSnowColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glVertex3f(1.0f, -0.50f, 0.0f);
+        glVertex3f(1.2f, -0.52f, 0.0f);
+
+        setSnowColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glVertex3f(1.2f, -0.40f, 0.0f);
+        glVertex3f(1.1f, -0.35f, 0.0f);
+        glVertex3f(1.0f, -0.42f, 0.0f);
+        glEnd();
 
         glDisable(GL_POINT_SMOOTH);
         glDisable(GL_BLEND);
@@ -1094,9 +1461,6 @@ void displayGodzilla() {
     }
 }
 
-// ----------------------------------------------------------------
-// BOY OBJECT
-// ----------------------------------------------------------------
 // ----------------------------------------------------------------
 // BOY OBJECT (Layered Hair, Thinner Body, Shorter Legs - 52 Vertices)
 // ----------------------------------------------------------------
@@ -1364,7 +1728,7 @@ void animateFlock(int value) {
         glutPostRedisplay();
     }
 
-    //Reschedule the timer function for the next frame (~16ms for 60 FPS)
+    //16 == 60fps
     glutTimerFunc(16, animateFlock, TIMER_ID_FLIGHT);
 }
 
@@ -1461,10 +1825,6 @@ GLfloat ridgeColors[] = {
     0.18f, 0.23f, 0.45f, 0.5f
 };
 
-
-
-
-
 GLubyte ridgeIndices[] = {
     // Top ridge outline
     0,  1,
@@ -1518,3 +1878,6 @@ void displayMountains() {
 
     glDisable(GL_BLEND);
 }
+
+
+
