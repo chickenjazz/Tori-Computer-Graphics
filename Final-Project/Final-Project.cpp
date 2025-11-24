@@ -19,6 +19,7 @@ void mouseCallback(int button, int state, int x, int y);
 void animateGodzilla(int value);
 void animateFlock(int value);
 void birdMovement(int key, int x, int y);
+void displayMountains();
 
 const int NUM_BIRDS = 15;
 const GLfloat BIRD_COLOR[] = { 0.0f, 0.0f, 0.0f };
@@ -304,6 +305,7 @@ void Display() {
     glPushMatrix();
     glTranslatef(0.0f, groundShake, 0.0f);
     displayBackground();
+    displayMountains();
 
     // Draw Godzilla (He shakes independently)
     glPushMatrix();
@@ -971,83 +973,83 @@ void displayGodzilla() {
 // ----------------------------------------------------------------
 GLfloat boyVertices[] = {
     // 1. HEAD (Skin)
-    -0.035f,  0.03f, 0.0f,  // Top-Left 
-     0.035f,  0.03f, 0.0f,  // Top-Right
-     0.035f, -0.04f, 0.0f,  // Bottom-Right
-    -0.035f, -0.04f, 0.0f,  // Bottom-Left
+    -0.035f,  0.05f, 0.0f,  // Top-Left 
+     0.035f,  0.05f, 0.0f,  // Top-Right
+     0.035f, -0.02f, 0.0f,  // Bottom-Right
+    -0.035f, -0.02f, 0.0f,  // Bottom-Left
 
     // 3. HAIR BACK LAYER
--0.040f,  0.04f, 0.0f,  // Top-Left (Slightly overlaps main hair)
- 0.040f,  0.04f, 0.0f,  // Top-Right
- 0.025f, -0.01f, 0.0f,  // Bottom-Right (Tapered in towards the center)
--0.025f, -0.01f, 0.0f,  // Bottom-Left
+-0.040f,  0.06f, 0.0f,  // Top-Left (Slightly overlaps main hair)
+ 0.040f,  0.06f, 0.0f,  // Top-Right
+ 0.025f, 0.01f, 0.0f,  // Bottom-Right (Tapered in towards the center)
+-0.025f, 0.01f, 0.0f,  // Bottom-Left
 
 
-    // 2. HAIR TOP VOLUME - Main block
-    -0.045f,  0.08f, 0.0f,  // Top-Left 
-     0.045f,  0.08f, 0.0f,  // Top-Right
-     0.045f,  0.03f, 0.0f,  // Bottom-Right (Aligns with head top)
-    -0.045f,  0.03f, 0.0f,  // Bottom-Left
+// 2. HAIR TOP VOLUME - Main block
+-0.045f,  0.1f, 0.0f,  // Top-Left 
+ 0.045f,  0.1f, 0.0f,  // Top-Right
+ 0.045f,  0.05f, 0.0f,  // Bottom-Right (Aligns with head top)
+-0.045f,  0.05f, 0.0f,  // Bottom-Left
 
-    // 4. NECK (Skin)
-    -0.015f, -0.04f, 0.0f,  // Top-Left
-     0.015f, -0.04f, 0.0f,  // Top-Right
-     0.015f, -0.06f, 0.0f,  // Bottom-Right
-    -0.015f, -0.06f, 0.0f,  // Bottom-Left
+// 4. NECK (Skin)
+-0.015f, -0.02f, 0.0f,  // Top-Left
+ 0.015f, -0.02f, 0.0f,  // Top-Right
+ 0.015f, -0.04f, 0.0f,  // Bottom-Right
+-0.015f, -0.04f, 0.0f,  // Bottom-Left
 
-    // 5. BODY
-    -0.04f,  -0.06f, 0.0f,  // Top-Left 
-     0.04f,  -0.06f, 0.0f,  // Top-Right
-     0.04f,  -0.18f, 0.0f,  // Bottom-Right 
-    -0.04f,  -0.18f, 0.0f,  // Bottom-Left
+// 5. BODY
+-0.04f,  -0.04f, 0.0f,  // Top-Left 
+ 0.04f,  -0.04f, 0.0f,  // Top-Right
+ 0.04f,  -0.16f, 0.0f,  // Bottom-Right 
+-0.04f,  -0.16f, 0.0f,  // Bottom-Left
 
-    // 6. LEFT ARM 
-    -0.07f,  -0.06f, 0.0f,  // Top-Left 
-    -0.04f,  -0.06f, 0.0f,  // Top-Right 
-    -0.04f,  -0.13f, 0.0f,  // Bottom-Right
-    -0.07f,  -0.13f, 0.0f,  // Bottom-Left
+// 6. LEFT ARM 
+-0.07f,  -0.04f, 0.0f,  // Top-Left 
+-0.04f,  -0.04f, 0.0f,  // Top-Right 
+-0.04f,  -0.11f, 0.0f,  // Bottom-Right
+-0.07f,  -0.11f, 0.0f,  // Bottom-Left
 
-    // 7. RIGHT ARM 
-     0.04f,  -0.06f, 0.0f,  // Top-Left 
-     0.07f,  -0.06f, 0.0f,  // Top-Right 
-     0.07f,  -0.13f, 0.0f,  // Bottom-Right
-     0.04f,  -0.13f, 0.0f,  // Bottom-Left
+// 7. RIGHT ARM 
+ 0.04f,  -0.04f, 0.0f,  // Top-Left 
+ 0.07f,  -0.04f, 0.0f,  // Top-Right 
+ 0.07f,  -0.11f, 0.0f,  // Bottom-Right
+ 0.04f,  -0.11f, 0.0f,  // Bottom-Left
 
-     // 8. LEFT HAND (Skin)
-     -0.07f,  -0.13f, 0.0f,  // Top-Left
-     -0.05f,  -0.13f, 0.0f,  // Top-Right
-     -0.05f,  -0.15f, 0.0f,  // Bottom-Right
-     -0.07f,  -0.15f, 0.0f,  // Bottom-Left
+ // 8. LEFT HAND (Skin)
+ -0.07f,  -0.11f, 0.0f,  // Top-Left
+ -0.05f,  -0.11f, 0.0f,  // Top-Right
+ -0.05f,  -0.13f, 0.0f,  // Bottom-Right
+ -0.07f,  -0.13f, 0.0f,  // Bottom-Left
 
-     // 9. RIGHT HAND (Skin)
-      0.05f,  -0.13f, 0.0f,  // Top-Left
-      0.07f,  -0.13f, 0.0f,  // Top-Right
-      0.07f,  -0.15f, 0.0f,  // Bottom-Right
-      0.05f,  -0.15f, 0.0f,  // Bottom-Left
+ // 9. RIGHT HAND (Skin)
+  0.05f,  -0.11f, 0.0f,  // Top-Left
+  0.07f,  -0.11f, 0.0f,  // Top-Right
+  0.07f,  -0.13f, 0.0f,  // Bottom-Right
+  0.05f,  -0.13f, 0.0f,  // Bottom-Left
 
-     // 10. LEFT LEG (Shorter)
-     -0.04f, -0.18f, 0.0f, // Top-Left 
-     -0.01f, -0.18f, 0.0f, // Top-Right 
-     -0.01f, -0.28f, 0.0f, // Bottom-Right 
-     -0.04f, -0.28f, 0.0f, // Bottom-Left
+  // 10. LEFT LEG (Shorter)
+  -0.04f, -0.16f, 0.0f, // Top-Left 
+  -0.01f, -0.16f, 0.0f, // Top-Right 
+  -0.01f, -0.26f, 0.0f, // Bottom-Right 
+  -0.04f, -0.26f, 0.0f, // Bottom-Left
 
-     // 11. RIGHT LEG (Shorter)
-      0.01f, -0.18f, 0.0f, // Top-Left 
-      0.04f, -0.18f, 0.0f, // Top-Right 
-      0.04f, -0.28f, 0.0f, // Bottom-Right
-      0.01f, -0.28f, 0.0f, // Bottom-Left
+  // 11. RIGHT LEG (Shorter)
+   0.01f, -0.16f, 0.0f, // Top-Left 
+   0.04f, -0.16f, 0.0f, // Top-Right 
+   0.04f, -0.26f, 0.0f, // Bottom-Right
+   0.01f, -0.26f, 0.0f, // Bottom-Left
 
-     // 12. LEFT SHOE 
-     -0.04f, -0.28f, 0.0f, // Top-Left
-     -0.01f, -0.28f, 0.0f, // Top-Right
-     -0.01f, -0.30f, 0.0f, // Bottom-Right
-     -0.05f, -0.30f, 0.0f, // Bottom-Left
+   // 12. LEFT SHOE 
+   -0.04f, -0.26f, 0.0f, // Top-Left
+   -0.01f, -0.26f, 0.0f, // Top-Right
+   -0.01f, -0.28f, 0.0f, // Bottom-Right
+   -0.05f, -0.28f, 0.0f, // Bottom-Left
 
-     // 13. RIGHT SHOE 
-      0.01f, -0.28f, 0.0f, // Top-Left
-      0.04f, -0.28f, 0.0f, // Top-Right
-      0.05f, -0.30f, 0.0f, // Bottom-Right
-      0.01f, -0.30f, 0.0f, // Bottom-Left
+   // 13. RIGHT SHOE 
+    0.01f, -0.26f, 0.0f, // Top-Left
+    0.04f, -0.26f, 0.0f, // Top-Right
+    0.05f, -0.28f, 0.0f, // Bottom-Right
+    0.01f, -0.28f, 0.0f, // Bottom-Left
 };
 
 GLfloat boyColors[] = {
@@ -1272,3 +1274,118 @@ void birdMovement(int key, int x, int y) {
     glutPostRedisplay();
 }
 
+// ----------------------------------------------------------------
+// 8 SMALL MOUNTAIN SILHOUETTES (Vertex Arrays + Elements)
+// ----------------------------------------------------------------
+// -------------------------------------------------------------
+// CONNECTED MOUNTAIN RIDGE (smooth silhouette from left to right)
+// -------------------------------------------------------------
+GLfloat ridgeVertices[] = {
+    // --- Left to Right Peaks ---
+    -1.10f, -0.25f, 0.0f,   // 0 Base Left
+    -0.95f, -0.12f, 0.0f,   // 1 Peak 1
+    -0.75f, -0.25f, 0.0f,   // 2 Valley 1
+    -0.62f, -0.08f, 0.0f,   // 3 Peak 2
+    -0.48f, -0.25f, 0.0f,   // 4 Valley 2
+    -0.38f, -0.16f, 0.0f,   // 5 Peak 3
+    -0.25f, -0.25f, 0.0f,   // 6 Valley 3
+    -0.10f, -0.10f, 0.0f,   // 7 Peak 4
+     0.08f, -0.25f, 0.0f,   // 8 Valley 4
+     0.25f, -0.14f, 0.0f,   // 9 Peak 5
+     0.42f, -0.25f, 0.0f,   //10 Valley 5
+     0.58f, -0.09f, 0.0f,   //11 Peak 6
+     0.72f, -0.25f, 0.0f,   //12 Valley 6
+     0.85f, -0.16f, 0.0f,   //13 Peak 7
+     1.15f, -0.25f, 0.0f    //14 Base Right
+};
+
+GLfloat ridgeColors[] = {
+    // Base - deep distant blue
+    0.18f, 0.23f, 0.35f, 0.5f,
+
+    // Peak 1 - snowy highlight (dimmed)
+    0.50f, 0.58f, 0.88f, 0.5f,
+    0.18f, 0.23f, 0.65f, 0.5f,
+
+    // Peak 2
+    0.62f, 0.70f, 0.80f, 0.5f,
+    0.18f, 0.23f, 0.65f, 0.5f,
+
+    // Peak 3
+    0.54f, 0.62f, 0.72f, 0.5f,
+    0.18f, 0.23f, 0.35f, 0.5f,
+
+    // Peak 4 (taller)
+    0.66f, 0.74f, 0.84f, 0.5f,
+    0.18f, 0.23f, 0.85f, 0.5f,
+
+    // Peak 5
+    0.63f, 0.71f, 0.81f, 0.5f,
+    0.18f, 0.23f, 0.55f, 0.5f,
+
+    // Peak 6
+    0.64f, 0.72f, 0.82f, 0.5f,
+    0.18f, 0.23f, 0.35f, 0.5f,
+
+    // Peak 7
+    0.52f, 0.60f, 0.70f, 0.5f,
+    0.18f, 0.23f, 0.45f, 0.5f
+};
+
+
+
+
+
+GLubyte ridgeIndices[] = {
+    // Top ridge outline
+    0,  1,
+    2,  3,
+    4,  5,
+    6,  7,
+    8,  9,
+    10, 11,
+    12, 13,
+    14, // end
+
+    // Close shape down to the bottom
+    14,  // last top vertex
+    0    // back to first base vertex
+};
+
+void displayMountains() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    // --- Draw original mountains ---
+    glVertexPointer(3, GL_FLOAT, 0, ridgeVertices);
+    glColorPointer(4, GL_FLOAT, 0, ridgeColors);
+    glDrawElements(GL_TRIANGLE_STRIP, sizeof(ridgeIndices), GL_UNSIGNED_BYTE, ridgeIndices);
+
+    // --- Draw squished reflection ---
+    glPushMatrix();
+    // Move to water level first
+    glTranslatef(0.1f, -0.375f, 0.0f);
+    // Mirror and squish vertically (Y-axis)
+    glScalef(1.0f, -0.5f, 1.0f);
+
+    // Dimmed colors for reflection
+    GLfloat reflectionColors[15 * 4];
+    for (int i = 0; i < 15 * 4; i++) {
+        reflectionColors[i] = ridgeColors[i] * 0.5f; // darker & semi-transparent
+    }
+
+    // Draw reflection using same vertices
+    glVertexPointer(3, GL_FLOAT, 0, ridgeVertices);
+    glColorPointer(4, GL_FLOAT, 0, reflectionColors);
+    glDrawElements(GL_TRIANGLE_STRIP, sizeof(ridgeIndices), GL_UNSIGNED_BYTE, ridgeIndices);
+
+    glPopMatrix(); // restore original matrix so mountains are not deformed
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+
+    glDisable(GL_BLEND);
+}
