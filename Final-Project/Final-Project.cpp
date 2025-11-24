@@ -863,50 +863,53 @@ GLfloat godzillaVertices[] = {
 
 GLfloat godzillaColors[] = {
     // 1. MAIN BODY
-    0.25f, 0.2f, 0.25f,   // Top-Left
-    0.25f, 0.2f, 0.75f,   // Top-Right
-    0.25f, 0.2f, 0.25f,   // Bottom-Right
-    0.25f, 0.2f, 0.25f,   // Bottom-Left
+    0.25f, 0.2f, 0.25f, 1.0f,   // Top-Left
+    0.25f, 0.2f, 0.75f, 1.0f,  // Top-Right
+    0.25f, 0.2f, 0.25f, 0.9f,  // Bottom-Right
+    0.25f, 0.2f, 0.25f, 0.9f, // Bottom-Left
 
     // 2. HEAD
-    0.25f, 0.2f, 0.25f,   // Top-Left
-    0.25f, 0.2f, 0.75f,   // Top-Right
-    0.25f, 0.2f, 0.25f,   // Bottom-Right
-    0.25f, 0.2f, 0.25f,   // Bottom-Left
+    0.25f, 0.2f, 0.25f, 1.0f, // Top-Left
+    0.25f, 0.2f, 0.75f, 1.0f,  // Top-Right
+    0.25f, 0.2f, 0.25f, 1.0f,  // Bottom-Right
+    0.25f, 0.2f, 0.25f, 1.0f,  // Bottom-Left
 
     // 3. EYE
-    1.0f, 1.0f, 1.0f,     // Top-Left
-    1.0f, 1.0f, 1.0f,     // Top-Right
-    1.0f, 1.0f, 1.0f,     // Bottom-Right
-    1.0f, 1.0f, 1.0f,     // Bottom-Left
+    1.0f, 1.0f, 1.0f, 1.0f,  // Top-Left
+    1.0f, 1.0f, 1.0f, 1.0f,    // Top-Right
+    1.0f, 1.0f, 1.0f, 1.0f,    // Bottom-Right
+    1.0f, 1.0f, 1.0f, 1.0f,    // Bottom-Left
 
     // 4. BACK TRIANGLE
-    0.25f, 0.2f, 0.65f,   // Top-Left
-    0.25f, 0.2f, 0.25f,   // Top-Right
-    0.25f, 0.2f, 0.75f,   // Bottom-Right
+    0.25f, 0.2f, 0.65f, 1.0f,   // Top-Left
+    0.25f, 0.2f, 0.25f, 0.9f,  // bottem-left
+    0.25f, 0.2f, 0.75f, 0.9f, // Bottom-Right
 
     // 5. LEG
-    0.25f, 0.2f, 0.65f,   // Vertex 1
-    0.25f, 0.2f, 0.55f,   // Vertex 2
-    0.25f, 0.2f, 0.45f,   // Vertex 3
-    0.25f, 0.2f, 0.25f,   // Vertex 4
-    0.25f, 0.2f, 0.25f,   // Vertex 5
+    0.25f, 0.2f, 0.65f, 1.0f,  // Vertex 1
+    0.25f, 0.2f, 0.55f, 1.0f,  // Vertex 2
+    0.25f, 0.2f, 0.45f, 0.95f,  // Vertex 3
+    0.25f, 0.2f, 0.25f, 0.95f,  // Vertex 4
+    0.25f, 0.2f, 0.25f, 1.0f,  // Vertex 5
 
     // 6. ARM
-    0.25f, 0.2f, 0.35f,   // Vertex 1
-    0.25f, 0.2f, 0.75f,   // Vertex 2
-    0.25f, 0.2f, 0.35f,   // Vertex 3
-    0.25f, 0.2f, 0.25f,   // Vertex 4
-    0.25f, 0.2f, 0.25f,   // Vertex 5
-    0.0f, 0.0f, 0.0f,     // Vertex 6
+    0.25f, 0.2f, 0.35f,1.0f,   // Vertex 1
+    0.25f, 0.2f, 0.75f, 1.0f,  // Vertex 2
+    0.25f, 0.2f, 0.35f, 1.0f,  // Vertex 3
+    0.25f, 0.2f, 0.25f, 1.0f,  // Vertex 4
+    0.25f, 0.2f, 0.25f, 1.0f,  // Vertex 5
+    0.0f, 0.0f, 0.0f,  1.0f,   // Vertex 6
 };
 
 void displayGodzilla() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
     glVertexPointer(3, GL_FLOAT, 0, godzillaVertices);
-    glColorPointer(3, GL_FLOAT, 0, godzillaColors);
+    glColorPointer(4, GL_FLOAT, 0, godzillaColors);
 
     glDrawArrays(GL_QUADS, 0, 12);
     glDrawArrays(GL_TRIANGLES, 12, 3);
@@ -944,6 +947,8 @@ void displayGodzilla() {
         glVertex3f(baseX, baseY, 0.0f);
         glColor3fv(neonBaseColor);
         glVertex3f(nextBaseX, nextBaseY, 0.0f);
+
+        glDisable(GL_BLEND);
         glEnd();
     }
 }
