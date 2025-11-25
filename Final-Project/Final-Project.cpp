@@ -24,6 +24,7 @@ void animateBoyRun(int value);
 void drawBoyText();
 void setSnowColor(float r, float g, float b, float a);
 void drawSnowBalls();
+void animateClouds(int value);
 
 const int NUM_BIRDS = 15;
 const GLfloat BIRD_COLOR[] = { 0.0f, 0.0f, 0.0f };
@@ -69,7 +70,7 @@ float snowYs[200];
 
 
 // ----------------------------------------------------------------
-// HELPER: DRAW A CLOUD (Procedural Circles)
+// HELPER: DRAW A CLOUD (Procedural)
 // ----------------------------------------------------------------
 void drawCloud(float cx, float cy, float size, float offset) {
     // 1. Apply Animation Offset
@@ -98,14 +99,14 @@ void drawCloud(float cx, float cy, float size, float offset) {
 
     glColor4f(R, G, B, 0.15f);
 
-    // Draw 4 overlapping circles (Top, Sides, and a wide Bottom base)
+    // Draw 6 overlapping circles (Top, Sides, and a Bottom base)
     float offsets[6][3] = {
         { 0.0f,  0.5f,  1.0f},   // 1. Main Top Center
         { 0.0f,  -0.1f,  0.6f},   // 1. Main Top Center
         {-0.75f, 0.0f,  0.75f},  // 2. Left Middle
         { 0.75f, 0.0f,  0.75f},  // 3. Right Middle
         {-1.5f, -0.4f, 0.3f},  // 4. Bottom Left (Creates the oblong base)
-        {1.5f, -0.4f, 0.3f},  // 4. Bottom Left (Creates the oblong base)
+        {1.5f, -0.4f, 0.3f},  // 5. Bottom RIght (Creates the oblong base)
     };
 
     for (int j = 0; j < 6; j++) {
@@ -163,14 +164,20 @@ void keyboardMonitor(unsigned char key, int x, int y) {
     }
 }
 
+
+void animateClouds(int value) {
+    cloudOffset1 += 0.00005f; // lower/farther = slower mv
+    cloudOffset2 += 0.00008f; // medium mv
+    cloudOffset3 += 0.0002f;  // fast mv
+
+    glutPostRedisplay();
+    glutTimerFunc(16, animateClouds, 0);
+}
 // ----------------------------------------------------------------
 // TIMER FUNCTION (ANIMATION)
 // ----------------------------------------------------------------
 void animateGodzilla(int value) {
-    // --- CLOUDS SHOULD ALWAYS MOVE ---
-    cloudOffset1 += 0.00005f; //far = slower
-    cloudOffset2 += 0.00008f; // medium
-    cloudOffset3 += 0.0002f;  // fast
+    
 
     // --- GODZILLA STARTS MOVING ONLY AFTER 10 SECONDS ---
     if (value == 1) {
@@ -180,13 +187,13 @@ void animateGodzilla(int value) {
             groundShake = 0.002f * abs(sin(godzillaX * 20.0f));
         }
     }
-
-    // Always redraw
     glutPostRedisplay();
-
-    // Loop timer
     glutTimerFunc(16, animateGodzilla, value);
 }
+
+// ----------------------------------------------------------------------
+// CHANGE FROM DAY TO DAWN (& VICE VERSA)
+// ----------------------------------------------------------------------
 
 void animateBackground(int value) {
     if (isTransitioning) {
@@ -206,6 +213,10 @@ void animateBackground(int value) {
 
     glutTimerFunc(16, animateBackground, 0);
 }
+
+// -----------------------------------------------------------------------
+// ANIMATE SNOWING AND ITS FADING WHEN TOGGLED OFF
+// -----------------------------------------------------------------------
 
 void animateSnowfall(int value) {
     // 1. HANDLE FADING
@@ -229,7 +240,7 @@ void animateSnowfall(int value) {
         for (int i = 0; i < totalSnowBalls; i++) {
             snowYs[i] -= 0.02f;
 
-            if (snowYs[i] < -1.0f) {
+            if (snowYs[i] < -1.0f) { //if snow exceeds bottom bring back to the top
                 snowYs[i] = 1.0f;
                 snowXs[i] = ((float)(rand() % 100) / 50.0f) - 1.0f;
             }
@@ -266,7 +277,6 @@ void initSnowBalls() {
         snowYs[i] = ((float)(rand() % 100) / 50.0f);          // random Y (0 to 2)
     }
 }
-
 
 
 // ----------------------------------------------------------------
@@ -445,7 +455,7 @@ void displayBackground() {
     glColorPointer(3, GL_FLOAT, 0, seaColors);
     glDrawArrays(GL_QUADS, 0, 4);
 
-    // ------------------------------------
+  // ------------------------------------
   // 4. TEXTURED SNOW FIELD
   // ------------------------------------
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -558,6 +568,7 @@ int main(int argc, char** argv) {
     glutTimerFunc(16, animateGodzilla, 0);
     glutTimerFunc(10000, animateGodzilla, 1);
     glutTimerFunc(16, animateBoyRun, 0);
+    glutTimerFunc(16, animateClouds, 0);
     glutKeyboardFunc(keyboardMonitor);
     glutMouseFunc(mouseCallback);
     glutDisplayFunc(Display);
