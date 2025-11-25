@@ -64,9 +64,9 @@ float cloudOffset3 = 0.0f; // High (Fastest)
 
 inline float mixf(float a, float b, float t);//for intepolation (transition)
 
-const int totalSnowBalls = 200; // number of snowballs
-float snowXs[200];
-float snowYs[200];
+const int totalSnowBalls = 200; // number of snowballs falling on screen
+float snowXs[totalSnowBalls];
+float snowYs[totalSnowBalls];
 
 
 // ----------------------------------------------------------------
